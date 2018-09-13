@@ -1,0 +1,121 @@
+{
+  "name": "DispatchResponse",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=8.0 <11"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "!win32"
+  ],
+  "description": "Technology Driven Solutions for Emergency Responders",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./bin/www",
+    "start:dev": "nodemon ./bin/www",
+    "test": "NODE_ENV=mocha-testing nyc mocha --watch --timeout=3000 ./tests/*/*.test.js --sort"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DispatchResponse/dispatchResponseApp.git"
+  },
+  "author": "Kevin Coyner, Nick Freeman",
+  "license": "MIT",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "https://dispatchresponse.com",
+  "dependencies": {
+    "aws-amplify": "0.3.3",
+    "aws-amplify-react": "0.1.43",
+    "aws-sdk": "2.205.0",
+    "axios": "^0.17.1",
+    "babel-core": "6.26.3",
+    "babel-jest": "23.2.0",
+    "babel-loader": "7.1.5",
+    "babel-plugin-transform-object-rest-spread": "6.26.0",
+    "babel-polyfill": "6.26.0",
+    "babel-preset-env": "1.7.0",
+    "babel-preset-react": "6.24.1",
+    "babel-preset-stage-0": "6.24.1",
+    "babel-preset-stage-2": "6.24.1",
+    "body-parser": "1.18.2",
+    "chalk": "2.4.1",
+    "compression": "1.7.2",
+    "connect-redis": "3.3.3",
+    "connect-session-sequelize": "^5.2.1",
+    "cors": "2.8.4",
+    "cuid": "2.1.0",
+    "date-fns": "^1.29.0",
+    "dotenv": "5.0.1",
+    "env2": "2.2.0",
+    "express": "4.16.2",
+    "express-session": "^1.15.6",
+    "fs": "0.0.1-security",
+    "history": "^4.7.2",
+    "jquery": "3.3.1",
+    "luxon": "1.0.0",
+    "mailgun-js": "^0.20.0",
+    "morgan": "1.9.0",
+    "node-schedule": "1.3.0",
+    "nodemailer": "4.6.5",
+    "papaparse": "^4.5.0",
+    "path": "0.12.7",
+    "pg": "7.4.1",
+    "pg-hstore": "2.3.2",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-loadable": "5.4.0",
+    "react-router-dom": "^4.2.2",
+    "redis": "2.8.0",
+    "request": "2.83.0",
+    "sequelize": "4.35.2",
+    "serve-favicon": "2.4.5",
+    "twilio": "^3.19.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.1",
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "debug": "3.1.0",
+    "debug-log": "1.0.1",
+    "enzyme": "3.3.0",
+    "enzyme-to-json": "3.3.3",
+    "eslint": "4.19.1",
+    "faker": "^4.1.0",
+    "identity-obj-proxy": "3.0.0",
+    "install": "^0.10.4",
+    "jest": "22.4.2",
+    "mocha": "^5.2.0",
+    "nodemon": "1.17.1",
+    "npm": "^5.6.0",
+    "nyc": "^12.0.2",
+    "raf": "3.4.0",
+    "react-test-renderer": "16.2.0",
+    "sequelize-mock": "0.10.2",
+    "supertest": "^3.1.0",
+    "supertest-session": "^3.3.0"
+  },
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      ".*.svg"
+    ],
+    "setupFiles": [
+      "raf/polyfill"
+    ],
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
+    "moduleNameMapper": {
+      "^.+\\.(css|scss)$": "identity-obj-proxy",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/util/fileMock.js"
+    },
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/util/assetsTransformer.js"
+    }
+  }
+}

@@ -1,0 +1,86 @@
+/**
+ * controllers/incidents_statuses.js
+ *
+ */
+
+const db = require('../models')
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op
+
+
+// get, save, update, delete
+
+// getIncidentStatusById: returns one incident_status by inc_id
+const getIncStatusById = (incStatusId) => {
+    return db.incident_statuses.findOne({
+      where: {
+        inc_status_id: incStatusId
+      }
+    })
+    .then( incStatus => incStatus )
+    .catch( err => err )
+}
+
+// getIncidentsStatusByIncidentId: returns incidentStatus by inc_id
+const getIncStatusByIncId = (incId) => {
+  // get incident that matches id
+  return db.incidents.findOne({
+      where: {
+        inc_id: incId
+      },
+      raw: true
+    })
+    .then(inc => {
+      return db.incident_statuses.findOne({
+        where: {
+          inc_status_id: inc.inc_status_id
+        }
+      })
+    })
+    .then( incidentStatus => incidentStatus )
+    .catch( err => err )
+
+}
+
+// saveIncident: saves incident and returns new incident_id
+const saveIncStatus = (incidentStatus, incId) => {
+  if (incId) incidentStatus.inc_id = incId
+  return db.incident_statuses.create(incidentStatus)
+  .then( incStatus => incStatus.id )
+  .catch( err => err )
+}
+
+// saveAllIncidents: saves all incident_statuses and returns success/fail
+const saveAllIncStatuses = (incidentStatusColl) => {
+  return db.incident_statuses.bulkCreate(incidentStatusColl)
+    .then( response => 'success' )
+    .catch( err => err )
+}
+
+// updateIncStatus
+const updateIncStatus = (incStatusId, incStatusUpdate) => {
+  return db.incident_statuses.update(incStatusUpdate,
+  {
+    returning: true,
+    raw: true,
+    where: {
+      inc_status_id: incStatusId
+    }
+  })
+  .then(updatedStatus => updatedStatus)
+  .catch(err => err)
+}
+
+// updateAllApparatus
+
+// deleteApparatus
+
+// deleteAllApparatus
+
+module.exports = {
+  getIncStatusById    : getIncStatusById,
+  getIncStatusByIncId : getIncStatusByIncId,
+  saveIncStatus       : saveIncStatus,
+  saveAllIncStatuses  : saveAllIncStatuses,
+  updateIncStatus     : updateIncStatus
+}
