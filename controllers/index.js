@@ -10,6 +10,7 @@ const respUser = require('./responses_users')
 const sta = require('./stations')
 const trackUserApp = require('./track_user_apparatus')
 const trackUserSta = require('./track_user_stations')
+const trackUserDept = require('./track_user_departments')
 const user = require('./users')
 
 const ctrl = {
@@ -21,6 +22,7 @@ const ctrl = {
   'incStatus'     : incStatus,
   'inc'           : inc,
   'sta'           : sta,
+  'trackUserDept' : trackUserDept,
   'trackUserApp'  : trackUserApp,
   'trackUserSta'  : trackUserSta,
   'respApp'       : respApp,

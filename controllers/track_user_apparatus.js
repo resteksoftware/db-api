@@ -1,5 +1,5 @@
 /**
- * controllers/stations.js
+ * controllers/track_user_apparatus.js
  *
  */
 
@@ -10,38 +10,44 @@ const Op = Sequelize.Op
 
 // get, save, update, delete
 
-// getApparatusByUserId: returns apparatus list by user_id
-const getAppsByUserId = (userId) => {
-  return new Promise( (resolve, reject) => {
-    db.track_user_apparatus.find({
-      where: {
-        user_id: userId
-      },
-      raw: true
-    })
-    .then( apparatusIds => resolve(apparatusIds) )
-    .catch( err => reject(err) )
+const getTrackUserAppsByUserId = (userId) => {
+  return db.track_user_apparatus.findAll({
+    where: {
+      user_id: userId
+    },
+    raw: true
   })
+  .then( apparatusIds => apparatusIds )
+  .catch( err => err ) 
 }
 
-// saveStation: saves Station and returns new dept_id
 const saveTrackUserApp = (userId, appId) => {
   let track_user_apparatus = {
     user_id : userId,
     app_id  : appId
   }
-  return new Promise( (resolve, reject) => {
-    db.stations.create(station)
-    .then( trkUsrApp => resolve(trkUsrApp.id) )
-    .catch( err => reject(err) )
+  return  db.stations.create(track_user_apparatus)
+  .then( userAppId => userAppId.id )
+  .catch( err => err )
+}
+
+// no need for update
+
+const deleteTrackUserDeptById = (userAppId) => {
+  return db.track_user_departments.destroy({
+    where: {
+      user_app_id: userAppId
+    },
+    raw: true
   })
+  .then(resp => 'user app track has been deleted')
+  .catch(err => err)
 }
 
 
-// updateApparatus
+module.exports = {
+  getTrackUserAppsByUserId : getTrackUserAppsByUserId,
+  saveTrackUserApp         : saveTrackUserApp,
+  deleteTrackUserDeptById  : deleteTrackUserDeptById,
+}
 
-// updateAllApparatus
-
-// deleteApparatus
-
-// deleteAllApparatus

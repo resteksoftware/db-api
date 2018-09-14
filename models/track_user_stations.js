@@ -28,6 +28,9 @@ module.exports = (sequelize, DataTypes) => {
       getterMethods: {
         id: function () {
           return this.getDataValue('user_sta_id')
+        },
+        sta_id: function () {
+          return this.getDataValue('sta_id')
         }
       }
     }

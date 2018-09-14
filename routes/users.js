@@ -36,6 +36,21 @@ users.get('/', async (req, res, next) => {
   res.send(userRes)
 })
 
+/**
+ * Returns track list 
+ */
+users.get('/track/:userId', async (req, res, next) => {
+  let userId = req.params.userId
+
+  let response = {
+    track_user_dept : await ctrl.trackUserDept.getTrackUserDeptsByUserId(userId),
+    track_user_sta  : await ctrl.trackUserSta.getTrackUserStasByUserId(userId),
+    track_user_app  : await ctrl.trackUserApp.getTrackUserAppsByUserId(userId)
+  };
+
+  res.send(response)
+})
+
 
 /**
  * Returns updated user matching userId

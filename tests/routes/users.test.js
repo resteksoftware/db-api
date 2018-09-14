@@ -323,6 +323,44 @@ describe('API/USERS', function() {
         })
       })
 
+      it('should get users matching app_id', function(done) {
+        let bodyDetails = { app_id: appId }
+        let userIdArr = [...userIds]
+
+        request(server)
+        .get(`/api/users/`)
+        .send(bodyDetails)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) console.log(err)
+          expect(res.body).to.be.an('array')
+          expect(res.body[0]).to.have.property('user_id').that.is.a('number')
+          expect(appId).to.equal(res.body[0].app_id)
+          expect(userIdArr[0]).to.equal(res.body[0].user_id)
+          done()
+        })
+      })
+
+    })
+
+    describe('GET "/track', function(done) {
+      it('should get all tracks based off user id', function (done) {
+        
+        let userIdArr = [...userIds] 
+
+        request(server)
+          .get(`/api/users/track/${userIdArr[0]}`)
+          .expect(200)
+          .end(function (err, res) {
+            if (err) console.log(err)
+            if (DEBUG) console.log(`👉 [TEST] GET '/track' \nbody: ${JSON.stringify(res.body, null, 2)}`);
+            expect(res.body).to.be.an('object')
+            expect(res.body).to.have.property('track_user_app').that.is.a('array')
+            expect(res.body).to.have.property('track_user_sta').that.is.a('array')
+            expect(res.body).to.have.property('track_user_dept').that.is.a('array')
+            done()
+          })
+      })
     })
 
     describe('PATCH "/:userId"', function(done) {
