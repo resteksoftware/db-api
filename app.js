@@ -34,6 +34,8 @@ const NODE_ENV = process.env.NODE_ENV
 
 const DEBUG = require('./logconfig').app
 
+const consumeSQS = require('./util/consumeSQS').app
+
 if (NODE_ENV !== 'mocha-testing') {
   // /** morgan - log only 4xx and 5xx responses to console */
   app.use(
@@ -77,7 +79,7 @@ app.use('/d/:incId/:userId', async (req, res, next) => {
   let incData = await ctrl.inc.getIncById(incId)
   let usrData = await ctrl.user.getAllUsersByIds(userId)
   let deptData = await ctrl.dept.getDeptByUserId(userId)
-  
+
   let respData = {
     resp_user: await ctrl.respUser.getRespUserByIncId(incId),
     resp_app: await ctrl.respApp.getRespAppByIncId(incId)
@@ -134,5 +136,10 @@ app.get('/dispatch-history', (req, res) => {
   res.send(`<!DOCTYPE html><html> <head> <meta charset='utf-8'> <title>Dispatch Response</title> <style>@font-face{font-family: 'VT323'; font-style: normal; font-weight: 400; src: local('VT323 Regular'), local('VT323-Regular'), url(https://fonts.gstatic.com/s/vt323/v9/pxiKyp0ihIEF2isfFJXUdVNF.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}.container{display: flex; height: 100vh; width:100vw; justify-content: center; align-items: center; background-color: white;}.title{color: firebrick; font-family: 'VT323', monospace; font-size: 2em;}</style> </head> <body> <div class='container'> <div class='title'>Dispatch Response can only be accessed from text message.</div></div></body></html>`)
 })
 
+consumeSQS.on('error', (err) => {
+  console.error('ERROR during consumeSQS: ' + err.message)
+})
+
+consumeSQS.start()
 
 module.exports = app

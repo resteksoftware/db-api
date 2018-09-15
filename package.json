@@ -72,6 +72,7 @@
     "request": "2.83.0",
     "sequelize": "4.35.2",
     "serve-favicon": "2.4.5",
+    "sqs-consumer": "3.8.0",
     "twilio": "^3.19.2"
   },
   "devDependencies": {
