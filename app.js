@@ -142,8 +142,6 @@ consumeSQS.on('error', (err) => {
 })
 
 const dbNewPost = (parsedMessage, deptId) => {
-  console.log('parsedMessage: ', parsedMessage)
-  console.log('deptId: ', deptId)
   axios.post(`http://0.0.0.0:8080/api/incidents/${deptId}`, {
     formatted: {
       inc: parsedMessage.data,
@@ -180,7 +178,6 @@ consumeSQS.on('message_received', (message) => {
     console.log('ERROR in consumeSQS and handleMessage: ' + e.message)
   }
 })
-
 
 consumeSQS.start()
 

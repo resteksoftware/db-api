@@ -29,9 +29,7 @@ incidents.get('/', async (req, res) => {
     incRes = await ctrl.inc.getAllIncsByDeptId(body.dept_id)
     res.send(incRes)
   }
-
 })
-
 
 /**
  * Update an incident
@@ -74,16 +72,8 @@ incidents.patch('/', async (req, res) => {
  * Process (POST) a new incoming call.
  */
  incidents.post('/:deptId', async (req, res) => {
-   /**
-   * PART 0 OF POST:
-   * Determine who POSTer is
-   * NOTE: this will be factored out in the future
-   */
-
    const deptId = req.params.deptId
-   const IP = req.headers['x-forwarded-for'] || req.connection.remoteAddress
    let body = null
-   let processedData;
 
    if (Object.values(req.query).length !== 0) {
      /* x-www-form-urlencoded, therefore use req.query */
@@ -93,17 +83,11 @@ incidents.patch('/', async (req, res) => {
      body = JSON.parse(req.body)
    }
 
-   if (DEBUG) console.log('IP: ', IP)
-   // logging to figure out what Dispatch is sending
-   if (DEBUG) console.info(`${logDate('INFO')}FROM DISPATCH AT IP ${IP} UNFORMATTED:  ${JSON.stringify(body, null, 4)}`)
-
    /**
    * PART 1 OF POST:
    * Process incoming call data and break out to conform to necessary inserts
    * NOTE: this will factored out in the future
    */
-
-  console.log('************ body: ', body)
 
    let inc;
    let incStatus;
@@ -112,7 +96,6 @@ incidents.patch('/', async (req, res) => {
 
    if (body.hasOwnProperty('formatted')) {
      inc = body.formatted.inc
-     inc.slug = 'dkf19kdsg' // TODO: fix this with real slugs
      inc.hot_zone = JSON.stringify(inc.hot_zone)
      inc.warm_zone = JSON.stringify(inc.warm_zone)
      incStatus = body.formatted.incStatus
@@ -124,48 +107,6 @@ incidents.patch('/', async (req, res) => {
        inc_id: '',
        assignment: body.formatted.incAssignment + ''
      }
-   } else {
-     processedData = await processData(body)
-
-     incStatus = {
-       'pending'   : '',
-       'active'    : '',
-       'closed'    : '',
-       'cancelled' : '',
-       'filed'     : ''
-     };
-
-     inc = {
-       'fd_dispatch_id'  : processedData.cfs_no           || '',
-       'slug'            : processedData.slug             || '',
-       'timeout'         : processedData.timeout          || '',
-       'radio_freq'      : processedData.radio_freq       || '',
-       'inc_category'    : processedData.call_category    || '',
-       'inc_description' : processedData.call_description || '',
-       'inc_type_code'   : processedData.call_type        || '',
-       'apt_no'          : processedData.apt_no           || '',
-       'location'        : processedData.location         || '',
-       'location_name'   : processedData.location_name    || '',
-       'location_type'   : processedData.location_type    || '',
-       'city'            : processedData.city             || '',
-       'zip'             : processedData.zip              || '',
-       'cross_street'    : processedData.cross_street     || '',
-       'map_ref'         : processedData.map_ref          || '',
-       'latitude'        : processedData.latitude         || '',
-       'longitude'       : processedData.longitude        || '',
-       'hot_zone'        : processedData.hot_zone         || '',
-       'warm_zone'       : processedData.warm_zone        || '',
-       'test_call'       : processedData.test_call        || ''
-     };
-
-     incRemark = {
-       'remark': processedData.cfs_remark
-     };
-
-     incAssignment = {
-       'assignment': processedData.assignment
-     };
-
    }
 
   /**
@@ -175,17 +116,10 @@ incidents.patch('/', async (req, res) => {
     // insert inc_status
     let incStatusId = await ctrl.incStatus.saveIncStatus(incStatus)
     // insert incident
-    console.log('*************************************************');
-    console.log('incStatusId: ', incStatusId)
-    console.log('deptId: ', deptId)
     let incId = await ctrl.inc.saveInc(inc, deptId, incStatusId)
     // insert inc_remark
     incRemark.inc_id = incId
     incAssignment.inc_id = incId
-    console.log('incId: ', incId)
-    console.log('incAssignment: ', incAssignment)
-    // console.log('inc: ', inc)
-    console.log('*************************************************');
     let incRemarkId = await ctrl.incRemark.saveIncRemark(incRemark)
     // insert inc_assignment
     let incAssignmentId = await ctrl.incAssignment.saveIncAssignment(incAssignment)
@@ -234,10 +168,6 @@ incidents.patch('/', async (req, res) => {
      inc_remark_id     : incRemarkId,
      inc_assignment_id : incAssignmentId
    })
-
  })
-
-
-
 
 module.exports = incidents
