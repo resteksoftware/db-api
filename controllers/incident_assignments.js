@@ -38,7 +38,9 @@ const saveIncAssignment = (incidentAssignment, incId) => {
   if (incId) incidentAssignment.inc_id = incId
   return db.incident_assignments.create(incidentAssignment)
   .then( inc_assignment => inc_assignment.id )
-  .catch( err => err )
+  .catch(err => {
+    console.error(`ERROR in saveIncAssignment: ${err}`)
+  })
 }
 
 // saveAllIncidentAssignments: saves all incident_remarkes and returns success/fail

@@ -8,6 +8,7 @@ const chalk = require('chalk')
 const compression = require('compression')
 const cors = require('cors')
 const express = require('express')
+const axios = require('axios')
 
 // const favicon = require('serve-favicon')
 const morgan = require('morgan')
@@ -139,6 +140,47 @@ app.get('/dispatch-history', (req, res) => {
 consumeSQS.on('error', (err) => {
   console.error('ERROR during consumeSQS: ' + err.message)
 })
+
+const dbNewPost = (parsedMessage, deptId) => {
+  console.log('parsedMessage: ', parsedMessage)
+  console.log('deptId: ', deptId)
+  axios.post(`http://0.0.0.0:8080/api/incidents/${deptId}`, {
+    formatted: {
+      inc: parsedMessage.data,
+      incStatus: parsedMessage.data.inc_status,
+      incRemark: parsedMessage.data.inc_remarks,
+      incAssignment: parsedMessage.data.inc_assignment
+  }
+  })
+    .then(function (response) {
+    console.log(response);
+  })
+    .catch(function (error) {
+    console.log(error);
+  });
+}
+
+const dbUpdatePost = (parsedMessage, deptId) => {
+  // if an update, what route do we hit?
+  // incidents PATCH ?
+}
+
+consumeSQS.on('message_received', (message) => {
+  let parsedMessage = JSON.parse(message.Body)
+  let deptId = parseInt(message.MessageAttributes.departId.StringValue)
+  try {
+    if (parsedMessage.pubType === 'new') {
+      dbNewPost(parsedMessage, deptId)
+    } else if (parsedMessage.pubType === 'update') {
+      dbUpdatePost(parsedMessage, deptId)
+    } else {
+      console.error('Unknown type of POST')
+    }
+  } catch (e) {
+    console.log('ERROR in consumeSQS and handleMessage: ' + e.message)
+  }
+})
+
 
 consumeSQS.start()
 

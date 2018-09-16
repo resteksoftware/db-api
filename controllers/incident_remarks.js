@@ -38,7 +38,9 @@ const saveIncRemark = (incidentRemark, incId) => {
   if (incId) incidentRemark.inc_id = incId
   return db.incident_remarks.create(incidentRemark)
   .then( inc_remark => inc_remark.id )
-  .catch( err => err )
+  .catch( err => {
+    console.error(`ERROR in saveIncRemark: ${err}`)
+  })
 }
 
 // saveAllIncidentRemarks: saves all incident_remarkes and returns success/fail

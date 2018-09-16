@@ -21,25 +21,37 @@ const chalk = require('chalk')
 
 
 
-const dbPoster = (parsedMessage) => {
-  console.log('parsedMessage: ', parsedMessage)
-  // this is where we'll POST to the DB  ??
-}
-
+// const dbPoster = (parsedMessage, attribs) => {
+//   console.log('parsedMessage: ', parsedMessage)
+//   console.log('attribs: ', attribs)
+//   // this is where we'll POST to the DB  ??
+// }
 
 const app = Consumer.create({
   queueUrl: CONSUME_URL,
   region: REGION,
+  attributeNames: ['All'],
+  messageAttributeNames: ['departId'],
   handleMessage: (message, done) => {
-    let parsedMessage = JSON.parse(message.Body)
-    try {
-      dbPoster(parsedMessage)
-    } catch (e) {
-      console.log('ERROR in consumeSQS and handleMessage: ' + e.message)
-    }
     done() // this removes the message from the queue
   }
 })
+
+
+// const app = Consumer.create({
+//   queueUrl: CONSUME_URL,
+//   region: REGION,
+//   handleMessage: (message, done) => {
+//     let parsedMessage = JSON.parse(message.Body)
+//     let attribs = message.MessageGroupId
+//     try {
+//       dbPoster(parsedMessage, attribs)
+//     } catch (e) {
+//       console.log('ERROR in consumeSQS and handleMessage: ' + e.message)
+//     }
+//     done() // this removes the message from the queue
+//   }
+// })
 
 // app.on('error', (err) => {
 //   console.log(err.message)

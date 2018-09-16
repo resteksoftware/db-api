@@ -103,6 +103,8 @@ incidents.patch('/', async (req, res) => {
    * NOTE: this will factored out in the future
    */
 
+  console.log('************ body: ', body)
+
    let inc;
    let incStatus;
    let incRemark;
@@ -110,8 +112,9 @@ incidents.patch('/', async (req, res) => {
 
    if (body.hasOwnProperty('formatted')) {
      inc = body.formatted.inc
-     inc.hot_zone = JSON.stringify(body.formatted.inc.hot_zone)
-     inc.warm_zone = JSON.stringify(body.formatted.inc.warm_zone)
+     inc.slug = 'dkfjakdsg' // TODO: fix this with real slugs
+     inc.hot_zone = JSON.stringify(inc.hot_zone)
+     inc.warm_zone = JSON.stringify(inc.warm_zone)
      incStatus = body.formatted.incStatus
      incRemark = body.formatted.incRemark
      incAssignment = body.formatted.incAssignment
@@ -166,8 +169,14 @@ incidents.patch('/', async (req, res) => {
     // insert inc_status
     let incStatusId = await ctrl.incStatus.saveIncStatus(incStatus)
     // insert incident
+    console.log('*************************************************');
+    console.log('incStatusId: ', incStatusId)
+    console.log('inc: ', inc)
+    console.log('deptId: ', deptId)
     let incId = await ctrl.inc.saveInc(inc, deptId, incStatusId)
     // insert inc_remark
+    console.log('incId: ', incId)
+    console.log('*************************************************');
     let incRemarkId = await ctrl.incRemark.saveIncRemark(incRemark, incId)
     // insert inc_assignment
     let incAssignmentId = await ctrl.incAssignment.saveIncAssignment(incAssignment, incId)
