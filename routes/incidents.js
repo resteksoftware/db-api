@@ -112,12 +112,18 @@ incidents.patch('/', async (req, res) => {
 
    if (body.hasOwnProperty('formatted')) {
      inc = body.formatted.inc
-     inc.slug = 'dkfjakdsg' // TODO: fix this with real slugs
+     inc.slug = 'dkf19kdsg' // TODO: fix this with real slugs
      inc.hot_zone = JSON.stringify(inc.hot_zone)
      inc.warm_zone = JSON.stringify(inc.warm_zone)
      incStatus = body.formatted.incStatus
-     incRemark = body.formatted.incRemark
-     incAssignment = body.formatted.incAssignment
+     incRemark = {
+       inc_id: '',
+       remark: body.formatted.incRemark
+     }
+     incAssignment = {
+       inc_id: '',
+       assignment: body.formatted.incAssignment + ''
+     }
    } else {
      processedData = await processData(body)
 
@@ -171,15 +177,18 @@ incidents.patch('/', async (req, res) => {
     // insert incident
     console.log('*************************************************');
     console.log('incStatusId: ', incStatusId)
-    console.log('inc: ', inc)
     console.log('deptId: ', deptId)
     let incId = await ctrl.inc.saveInc(inc, deptId, incStatusId)
     // insert inc_remark
+    incRemark.inc_id = incId
+    incAssignment.inc_id = incId
     console.log('incId: ', incId)
+    console.log('incAssignment: ', incAssignment)
+    // console.log('inc: ', inc)
     console.log('*************************************************');
-    let incRemarkId = await ctrl.incRemark.saveIncRemark(incRemark, incId)
+    let incRemarkId = await ctrl.incRemark.saveIncRemark(incRemark)
     // insert inc_assignment
-    let incAssignmentId = await ctrl.incAssignment.saveIncAssignment(incAssignment, incId)
+    let incAssignmentId = await ctrl.incAssignment.saveIncAssignment(incAssignment)
 
   /**
    * PART 3 OF POST:

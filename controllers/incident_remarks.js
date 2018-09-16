@@ -34,10 +34,11 @@ const getAllIncRemarksByIncId = (incId) => {
 }
 
 // saveIncidentRemark: saves incident_remark and returns new inc_remark_id
-const saveIncRemark = (incidentRemark, incId) => {
-  if (incId) incidentRemark.inc_id = incId
+const saveIncRemark = (incidentRemark) => {
   return db.incident_remarks.create(incidentRemark)
-  .then( inc_remark => inc_remark.id )
+  .then( inc_remark => {
+    return inc_remark.id
+  })
   .catch( err => {
     console.error(`ERROR in saveIncRemark: ${err}`)
   })

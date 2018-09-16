@@ -34,8 +34,7 @@ const getAllIncAssignmentsByIncId = (incId) => {
 }
 
 // saveIncidentAssignment: saves incident_remark and returns new inc_assignment_id
-const saveIncAssignment = (incidentAssignment, incId) => {
-  if (incId) incidentAssignment.inc_id = incId
+const saveIncAssignment = (incidentAssignment) => {
   return db.incident_assignments.create(incidentAssignment)
   .then( inc_assignment => inc_assignment.id )
   .catch(err => {
