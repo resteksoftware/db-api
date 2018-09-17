@@ -17,7 +17,6 @@ const DEBUG = require('../logconfig').routes.incidents // Set this to 'true' to 
  * Get all incidents ordered by created_at DESC.
  * @returns {array} Call objects in an array.
  */
-
 incidents.get('/', async (req, res) => {
   let body = JSON.parse(req.body)
   if (DEBUG) console.log(`👉 GET api/incidents/ \n body: ${JSON.stringify(body, null, 2)}`);
@@ -52,122 +51,163 @@ incidents.patch('/', async (req, res) => {
  * @param {string} userId - the userId.
  * @returns {array} Call object in a single item array. Limited attributes.
  */
- incidents.get('/:deptId/:slug/:userId', async (req, res) => {
-   let deptId = req.params.deptId;
-   let slug = req.params.slug;
-   // NOTE: userId is parsed and will likely change to a uuid
-   let userId = parseInt(req.params.userId);
-   let incident;
-   let user = await ctrl.user.getUserById(userId)
+incidents.get('/:deptId/:slug/:userId', async (req, res) => {
+  let deptId = req.params.deptId;
+  let slug = req.params.slug;
+  // NOTE: userId is parsed and will likely change to a uuid
+  let userId = parseInt(req.params.userId);
+  let incident;
+  let user = await ctrl.user.getUserById(userId)
 
-   if (user.user_id === userId) {
-     incident = await ctrl.inc.getIncByDeptIdAndSlug(deptId, slug)
-     res.send(incident)
-   } else {
-     res.sendStatus(401).end()
-   }
- })
+  if (user.user_id === userId) {
+    incident = await ctrl.inc.getIncByDeptIdAndSlug(deptId, slug)
+    res.send(incident)
+  } else {
+    res.sendStatus(401).end()
+  }
+})
 
 /**
- * Process (POST) a new incoming call.
+ * Process incoming incident. example inputs:
+ * 
+ * endpoint: /api/incidents/new
+ * req.body: { 
+ *  dept_id: deptId,
+ *  data: {
+ *    inc: { incident info },
+ *    incStatus: { incident status info },
+ *    incRemark: { incident remark info },
+ *    incAssignment: { incident assignment info } 
+ *  }
+ * }
+ * NOTE: dept_id is required for insertion of incident
+ * 
+ * endpoint: /api/incidents/assignment
+ * req.body: {
+ *  inc_id: incId,
+ *  data: {
+ *    incAssignment: { incident assignment info }
+ *  }
+ * }
+ * NOTE: inc_id is required for insertion of assignment
+ * 
+ * endpoint: /api/incidents/remark
+ * req.body: {
+ *  inc_id: incId,
+ *  data: {
+ *    incRemark: { incident remark info }
+ *  }
+ * }
+ * NOTE: inc_id is required for insertion of remark
  */
- incidents.post('/:deptId', async (req, res) => {
-   const deptId = req.params.deptId
-   let body = null
 
-   if (Object.values(req.query).length !== 0) {
-     /* x-www-form-urlencoded, therefore use req.query */
-     body = req.query
-   } else {
-     /* raw, therefore use req.body and JSON.parse it */
-     body = JSON.parse(req.body)
-   }
 
-   /**
-   * PART 1 OF POST:
-   * Process incoming call data and break out to conform to necessary inserts
-   * NOTE: this will factored out in the future
-   */
+incidents.post('/:incType', async (req, res, next) => {
+  const incType = req.params.incType;
+  let body = JSON.parse(req.body.data);
+  let deptId = JSON.parse(req.body.dept_id)
+  let incId = body.inc_id || false
 
-   let inc;
-   let incStatus;
-   let incRemark;
-   let incAssignment;
+  // incident is completely new
+  if (incType === 'new') {
+    // store incident details
+    let inc = body.inc
+    // stringify inc properties
+    inc.dept_id = deptId
+    inc.hot_zone = JSON.stringify(inc.hot_zone)
+    inc.warm_zone = JSON.stringify(inc.warm_zone)
+    // store inc_status details
+    let incStatus = body.incStatus
+    // store inc_remark details
+    let incRemark = { 
+      inc_id: '',
+      remark: body.incRemark
+    }
+    // store inc_assignment details
+    let incAssignment = {
+      inc_id = '',
+      assignment: body.incAssignment
+    }
 
-   if (body.hasOwnProperty('formatted')) {
-     inc = body.formatted.inc
-     inc.hot_zone = JSON.stringify(inc.hot_zone)
-     inc.warm_zone = JSON.stringify(inc.warm_zone)
-     incStatus = body.formatted.incStatus
-     incRemark = {
-       inc_id: '',
-       remark: body.formatted.incRemark
-     }
-     incAssignment = {
-       inc_id: '',
-       assignment: body.formatted.incAssignment + ''
-     }
-   }
-
-  /**
-   * PART 2 OF POST:
-   * Insert incoming incident as records
-   */
     // insert inc_status
     let incStatusId = await ctrl.incStatus.saveIncStatus(incStatus)
     // insert incident
-    let incId = await ctrl.inc.saveInc(inc, deptId, incStatusId)
+    let newIncId = await ctrl.inc.saveInc(inc, deptId, incStatusId)
     // insert inc_remark
-    incRemark.inc_id = incId
-    incAssignment.inc_id = incId
+    incRemark.inc_id = newIncId
+    incAssignment.inc_id = newIncId
     let incRemarkId = await ctrl.incRemark.saveIncRemark(incRemark)
     // insert inc_assignment
     let incAssignmentId = await ctrl.incAssignment.saveIncAssignment(incAssignment)
 
-  /**
-   * PART 3 OF POST:
-   * Fetch users that should be notified about the incident that was just inserted
-   * Return array of users as 'usersSubscribed'
-   */
 
-   // If call_type = 850, then this is the 0800 test and everyone should get it
-   // even if they are asleep. Otherwise, parse out user-apparatus relationships
-   // and respect everyone's sleep setting.
-   let usersSubscribed;
+    res.send({
+      inc_id: newIncId,
+      inc_status_id: incStatusId,
+      inc_remark_id: incRemarkId,
+      inc_assignment_id: incAssignmentId
+    })
 
-   if (inc.inc_type_code === '850') {
-    // get all users from department
-     usersSubscribed = await ctrl.user.getAllUsersByDeptId(deptId)
-   } else {
-     // get all apparatuses in department as sta_abbr + sta_id keys
-     let deptApps = await ctrl.app.getAllAppsByDeptId(deptId)
-     // filter apparatuses down to apparatuses on incident assignment
-     let incAppAssignment = incAssignment.assignment.split(',').filter(app => app !== '')
-     // filter department apparatuses down to apparatuses on incident assignment
-     let appAssignmentIds = deptApps.filter(app => incAppAssignment.includes(app.app_abbr)).map(app => app.app_id)
-     // get all user_tracking_apparatus based on apparatus keys filtered
-     let usersTrackingAppAssignment = await ctrl.user.getAllUsersByApparatusIds(appAssignmentIds)
-     // map users down to ids
-     let userIdsSubscribed = usersTrackingAppAssignment.map( user => user.user_id)
-     // get all users from userIdsSubscribed
-     usersSubscribed = await ctrl.user.getAllUsersByIds(userIdsSubscribed)
-   }
+    return
 
-   // TODO: send email using usersSubscribed
+  // incident is an update to assignment (new record)
+  } else if (incType === 'assignment') {
+    if (incId) {
+      let incAssignment = {
+        inc_id: incId,
+        assignment: body.incAssignment
+      }
 
-   incidents.delete('/:incId', async (req, res, next) => {
-     let incId = req.params.incId;
-     let response = { data: await ctrl.inc.deleteInc(incId) }
-     res.send(response)
-   })
+      let incAssignmentId = await ctrl.incAssignment.saveIncAssignment(incAssignment)
 
-   res.send({
-     users             : usersSubscribed,
-     inc_id            : incId,
-     inc_status_id     : incStatusId,
-     inc_remark_id     : incRemarkId,
-     inc_assignment_id : incAssignmentId
-   })
- })
+      res.send({ inc_assignment_id: incAssignmentId })
+    }
+  // incident is an update to remark (new record)
+  } else if (incType === 'remark') {
+    if (incId) {
+      let incRemark = {
+        inc_id: incId,
+        remark: body.incRemark
+      }
+
+      let incRemarkId = await ctrl.incRemark.saveIncRemark(incRemark)
+
+      res.send({ inc_remark_id: incRemarkId })
+    }
+    
+  } else {
+
+    res.send({ data: 'error' }) 
+  }
+
+})
+
+// incident is an update to statusId (new record)
+incidents.patch('/:incStatusId', async (req, res, next) => {
+  const incStatusId = req.params.incStatusId
+  const body = JSON.parse(req.body)
+  let update;
+
+  // if there is an inc_id in body and no incStatusId, then go get incStatusId from inc_id
+  if (body.inc_id && !incStatusId) {
+    update = body.data
+    incStatusId = await ctrl.inc.getIncStatusByIncId(incId)
+  } 
+
+  let response = await ctrl.incStatus.updateIncStatus(incStatusId, update)
+  
+  res.send(update)
+
+})
+
+
+
+incidents.delete('/:incId', async (req, res, next) => {
+  let incId = req.params.incId;
+  let response = { data: await ctrl.inc.deleteInc(incId) }
+  res.send(response)
+})
+
+ 
 
 module.exports = incidents

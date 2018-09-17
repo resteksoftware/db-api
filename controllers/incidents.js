@@ -48,6 +48,17 @@ const getIncById = (incId) => {
     .catch( err => err )
 }
 
+const getIncStatusByIncId = (incId) => {
+  return db.incidents.findOne({
+    where: {
+      inc_id: incId
+    },
+    raw: true
+  })
+  .then( inc => inc.inc_status_id)
+  .catch (err => console.error(err))
+}
+
 // getAllIncidentss: returns all incidents by deptId
 const getAllIncsByDeptId = (deptId) => {
 
@@ -187,6 +198,7 @@ module.exports = {
   getIncByDeptIdAndSlug : getIncByDeptIdAndSlug,
   getAllIncsByDeptId    : getAllIncsByDeptId,
   getRecentIncsByDeptId : getRecentIncsByDeptId,
+  getIncStatusByIncId   : getIncStatusByIncId,
   saveInc               : saveInc,
   saveAllIncs           : saveAllIncs,
   deleteInc             : deleteInc,

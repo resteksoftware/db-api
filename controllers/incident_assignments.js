@@ -49,8 +49,6 @@ const saveAllIncAssignments = (incidentAssignmentsColl) => {
   .catch( err => err )
 }
 
-// updateApparatus
-
 // updateAllApparatus
 
 // deleteApparatus
