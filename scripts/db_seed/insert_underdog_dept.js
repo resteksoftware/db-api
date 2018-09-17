@@ -4,8 +4,8 @@ const DEBUG = true;
 let department = {
     'dept_name': 'Underdog Technologies Fire Department',
     'dept_abbr': 'UDOG',
-    'dept_head': 'Kevin Coyner',
-    'dept_ip': '0.0.0.0.0.0',
+    'dept_head': 'Pete Siecienski',
+    'dept_ip': '69.195.33.74',
     'dept_city': 'Fairfield',
     'dept_state': 'CT',
     'dept_zip': '06824',
@@ -94,7 +94,7 @@ let stations = [
         'sta_name': 'Station 6',
         'sta_abbr': 'STA6',
         'is_enabled': true,
-        'sta_type': 'combination',
+        'sta_type': 'volunteer',
         // needs dept_id
         'sta_gps': '{lat: "", lng: ""}'
     },
@@ -102,7 +102,7 @@ let stations = [
         'sta_name': 'Station 7',
         'sta_abbr': 'STA7',
         'is_enabled': true,
-        'sta_type': 'combination',
+        'sta_type': 'volunteer',
         // needs dept_id
         'sta_gps': '{lat: "", lng: ""}'
     },
@@ -110,7 +110,7 @@ let stations = [
         'sta_name': 'Station 8',
         'sta_abbr': 'STA8',
         'is_enabled': true,
-        'sta_type': 'combination',
+        'sta_type': 'career',
         // needs dept_id
         'sta_gps': '{lat: "", lng: ""}'
     }
@@ -118,12 +118,12 @@ let stations = [
 
 let stationApparatusMapping = {
     STA1: ['DC', 'E1', 'T1', 'DECON', 'SO1', 'SQ1'],
-    STA2: ['E2', 'T2', 'U2', 'P2'],
-    STA3: ['E2', 'T2', 'U2', 'P2'],
-    STA4: ['E41', 'U4', 'L4', 'E4', 'SQ4', 'U4V'],
+    STA2: ['E2', 'TK2', 'U2', 'P2'],
+    STA3: ['E3', 'E31', 'U3'],
+    STA4: ['E41', 'L4', 'E4', 'SQ4', 'U4V'],
     STA5: ['E5', 'L5', 'E51', 'R5', 'R51'],
-    STA6: ['E62', 'T6', 'E61'],
-    STA7: ['E62', 'T6', 'E61'],
+    STA6: ['E62', 'TK6', 'E61'],
+    STA7: ['E71', 'TK7'],
     STA8: ['E8']
 }
 
@@ -196,19 +196,19 @@ let apparatus = [
         // needs sta_id
     },
     {
-        app_abbr:'T2',
+        app_abbr:'TK2',
         app_name : 'Tanker 2',
         is_enabled : true
         // needs sta_id
     },
     {
-        app_abbr: 'T7',
+        app_abbr: 'TK7',
         app_name: 'Tanker 7',
         is_enabled: true
         // needs sta_id
     },
     {
-        app_abbr: 'T6',
+        app_abbr: 'TK6',
         app_name: 'Tanker 6',
         is_enabled: true
         // needs sta_id
@@ -216,12 +216,6 @@ let apparatus = [
     {
         app_abbr : 'U2',
         app_name : 'Utility 2',
-        is_enabled : true
-        // needs sta_id
-    },
-    {
-        app_abbr : 'U4',
-        app_name : 'Utility 4',
         is_enabled : true
         // needs sta_id
     },
@@ -303,14 +297,13 @@ let apparatus = [
         is_enabled : true
         // needs sta_id
     }
-
 ]
 
 
 const seedUnderdog = async () => {
     // get carriers and add carrier_id to users
     let carriers = await axios.get('http://localhost:8080/api/carriers').then(resp => resp.data)
-    // add carrier_id to users 
+    // add carrier_id to users
     carriers.forEach( carrier => {
         if (carrier.carrier_name === 'Google Fi') {
             users[0].carrier_id = carrier.carrier_id
@@ -342,7 +335,7 @@ const seedUnderdog = async () => {
             let appToInsert;
             // iterate across available apparatus
             apparatus.forEach(app => {
-                
+
                 // set app if apparatus shares same app_abbr in station apparatus mapping
                 if (app.app_abbr === appAbbr) {
                     appToInsert = app
@@ -350,7 +343,7 @@ const seedUnderdog = async () => {
             })
             // add station id to apparatus
             appToInsert.sta_id = staId
-            
+
             // add default stations to users
             if (sta.sta_abbr === 'STA4') {
                 users[0].default_station = staId
@@ -359,10 +352,10 @@ const seedUnderdog = async () => {
             // post app
             let appId = await axios.post('http://localhost:8080/api/apparatus', appToInsert).then(resp => resp.data.app_id)
             output.push(appId)
-        }   
+        }
         console.log(`👉 sta_id: ${staId} has associated app_ids: ${output + ''}`)
     }
-    
+
     await axios({
         method: 'post',
         url: 'http://localhost:8080/api/users',
@@ -379,7 +372,7 @@ const seedUnderdog = async () => {
     }).then(res => res.data.map(user => user.user_id))
     if (DEBUG) console.log(`👉 userIds returned: \n${userIds}`);
     if (DEBUG) console.log(`👉 done`);
-    
+
 }
 
 seedUnderdog()
