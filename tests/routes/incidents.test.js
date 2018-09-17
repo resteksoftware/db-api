@@ -95,7 +95,7 @@ describe('API/INCIDENTS', function() {
     })
   })
 
-  describe('POST "/:deptId', function (done) {
+  describe('POST "/:incType', function (done) {
 
     it('should post an incident and return users relevant to incident', function (done) {
 
@@ -104,9 +104,10 @@ describe('API/INCIDENTS', function() {
         incidentRemark = data.inc.genIncRemark()
         incidentStatus = data.inc.genIncStatus()
         incidentAssignment = await data.inc.genIncAssignment(deptId)
-
+        
         let body = {
-          formatted: {
+          dept_id: deptId,
+          data: {
             inc: incident,
             incStatus: incidentStatus,
             incRemark: incidentRemark,
@@ -115,12 +116,11 @@ describe('API/INCIDENTS', function() {
         }
 
         request(server)
-        .post(`/api/incidents/${deptId}`)
+        .post(`/api/incidents/new`)
         .send(body)
         .expect(200)
         .end(function (err, res) {
           if (err) console.log(err);
-          expect(res.body).to.have.property('users').to.be.a('array')
           expect(res.body).to.have.property('inc_id').to.be.a('number')
           expect(res.body).to.have.property('inc_status_id').to.be.a('number')
           expect(res.body).to.have.property('inc_remark_id').to.be.a('number')

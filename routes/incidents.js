@@ -104,8 +104,8 @@ incidents.get('/:deptId/:slug/:userId', async (req, res) => {
 
 incidents.post('/:incType', async (req, res, next) => {
   const incType = req.params.incType;
-  let body = JSON.parse(req.body.data);
-  let deptId = JSON.parse(req.body.dept_id)
+  let body = JSON.parse(req.body).data;
+  let deptId = JSON.parse(req.body).dept_id
   let incId = body.inc_id || false
 
   // incident is completely new
@@ -121,12 +121,12 @@ incidents.post('/:incType', async (req, res, next) => {
     // store inc_remark details
     let incRemark = { 
       inc_id: '',
-      remark: body.incRemark
+      remark: body.incRemark + ''
     }
     // store inc_assignment details
     let incAssignment = {
-      inc_id = '',
-      assignment: body.incAssignment
+      inc_id: '',
+      assignment: body.incAssignment + ''
     }
 
     // insert inc_status

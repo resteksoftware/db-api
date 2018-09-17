@@ -139,7 +139,8 @@ describe('API/RESPONSES', function() {
                         incidentAssignment = { assignment: [...appIds].toString() }
 
                         let body = {
-                          formatted: {
+                          dept_id: deptId,
+                          data: {
                             inc: incident,
                             incStatus: incidentStatus,
                             incRemark: incidentRemark,
@@ -148,12 +149,11 @@ describe('API/RESPONSES', function() {
                         }
 
                         request(server)
-                        .post(`/api/incidents/${deptId}`)
+                        .post(`/api/incidents/new`)
                         .send(body)
                         .expect(200)
                         .end(function (err, res) {
                           if (err) console.log(err);
-                          expect(res.body).to.have.property('users').to.be.a('array')
                           expect(res.body).to.have.property('inc_id').to.be.a('number')
                           expect(res.body).to.have.property('inc_status_id').to.be.a('number')
                           expect(res.body).to.have.property('inc_remark_id').to.be.a('number')
