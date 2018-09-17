@@ -5,7 +5,11 @@ let department = {
     'dept_name': 'Underdog Technologies Fire Department',
     'dept_abbr': 'UDOG',
     'dept_head': 'Kevin Coyner',
-    'dept_ip': '0.0.0.0.0.0'
+    'dept_ip': '0.0.0.0.0.0',
+    'dept_city': 'Fairfield',
+    'dept_state': 'CT',
+    'dept_zip': '06824',
+    'dept_county': 'Fairfield County'
 }
 
 let users = [
@@ -305,7 +309,7 @@ let apparatus = [
 
 const seedUnderdog = async () => {
     // get carriers and add carrier_id to users
-    let carriers = await axios.post('http://localhost:8080/api/carriers')
+    let carriers = await axios.get('http://localhost:8080/api/carriers').then(resp => resp.data)
     // add carrier_id to users 
     carriers.forEach( carrier => {
         if (carrier.carrier_name === 'Google Fi') {
@@ -319,7 +323,7 @@ const seedUnderdog = async () => {
     console.log(`👉 Dept generated: \n${JSON.stringify(dept, null, 2)}`);
     // post department
     let deptId = await axios.post('http://localhost:8080/api/departments', dept).then(res => res.data.dept_id)
-    console.log(`👉 deptId returned: ${deptId}`);
+    console.log(`👉 deptId returned: ${JSON.stringify(deptId, null, 2)}`);
 
     // iterate across stations collection
     for (var i = 0; i < stations.length; i++) {
@@ -330,31 +334,33 @@ const seedUnderdog = async () => {
         // collect app_ids created
         let output = []
         // post station
-        let staId = await axios.post('http://localhost:8080/api/stations', sta)
+        let staId = await axios.post('http://localhost:8080/api/stations', sta).then(resp => resp.data.sta_id)
         // iterate across station's associated apparatuses
         for (var j = 0; j < stationApparatusMapping[sta.sta_abbr].length; j++) {
             // get app by app_abbr
             let appAbbr = stationApparatusMapping[sta.sta_abbr][j]
-            let app;
+            let appToInsert;
             // iterate across available apparatus
             apparatus.forEach(app => {
+                
                 // set app if apparatus shares same app_abbr in station apparatus mapping
                 if (app.app_abbr === appAbbr) {
-                    app = app
+                    appToInsert = app
                 }
             })
             // add station id to apparatus
-            app.sta_id = staId
+            appToInsert.sta_id = staId
+            
             // add default stations to users
-            if (appAbbr === 'STA4') {
+            if (sta.sta_abbr === 'STA4') {
                 users[0].default_station = staId
                 users[1].default_station = staId
             }
-            // post app 
-            let appId = await axios.post('http://localhost:8080/api/apparatus', app)
+            // post app
+            let appId = await axios.post('http://localhost:8080/api/apparatus', appToInsert).then(resp => resp.data.app_id)
             output.push(appId)
         }   
-        console.log(`👉 sta_id: ${staId} has associated app_ids: ${output}`)
+        console.log(`👉 sta_id: ${staId} has associated app_ids: ${output + ''}`)
     }
     
     await axios({
@@ -371,7 +377,7 @@ const seedUnderdog = async () => {
         url: 'http://localhost:8080/api/users/',
         data: { dept_id: deptId }
     }).then(res => res.data.map(user => user.user_id))
-    if (DEBUG) console.log(`👉 userIds returned: \n${JSON.stringify(userIds, null, 2)}`);
+    if (DEBUG) console.log(`👉 userIds returned: \n${userIds}`);
     if (DEBUG) console.log(`👉 done`);
     
 }
