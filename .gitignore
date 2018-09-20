@@ -6,3 +6,4 @@ dist/
 .tern-port
 .nyc_output
 npm-debug.log
+.vscode
