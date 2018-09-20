@@ -17,7 +17,11 @@ const app = express()
 const env = require('env2')('.env')
 const db = require('./models')
 const Sequelize = require('sequelize')
-const { or, gt, lt } = Sequelize.Op
+const {
+  or,
+  gt,
+  lt
+} = Sequelize.Op
 
 // import routes
 let apparatus = require('./routes/apparatus')
@@ -41,7 +45,7 @@ if (NODE_ENV !== 'mocha-testing') {
   // /** morgan - log only 4xx and 5xx responses to console */
   app.use(
     morgan('dev', {
-      skip: function (req, res) {
+      skip: function(req, res) {
         return res.statusCode < 400
       }
     })
@@ -60,9 +64,15 @@ app.use(compression())
 // app.use(favicon(path.join(__dirname, 'dist', 'favicon.ico')))
 
 // parse various different custom JSON types as JSON
-app.use(bodyParser.json({ type: 'application/*+json' }))
-app.use(bodyParser.raw({ type: 'application/*' }))
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json({
+  type: 'application/*+json'
+}))
+app.use(bodyParser.raw({
+  type: 'application/*'
+}))
+app.use(bodyParser.urlencoded({
+  extended: false
+}))
 
 app.options('*', cors(corsOptions)) // preflight cors, not sure if this is redundant to line 82
 
@@ -94,31 +104,32 @@ app.use('/d/:incId/:userId', async (req, res, next) => {
       resp: respData
     }
   })
-
 })
 
 
-function logErrors (err, req, res, next) {
+function logErrors(err, req, res, next) {
   console.error(chalk.red(err.stack))
   next(err)
 }
 
-function clientErrorHandler (err, req, res, next) {
+function clientErrorHandler(err, req, res, next) {
   if (req.xhr) {
-    res.status(500).send({ error: 'Something failed with xhr' })
+    res.status(500).send({
+      error: 'Something failed with xhr'
+    })
   } else {
     next(err)
   }
 }
 
-function errorHandler (err, res, req, next) {
+function errorHandler(err, res, req, next) {
   res.status(500)
   console.log('hey')
   // res.send('error', { error: err})
   next(err)
 }
 
-function error404 (err, res, req, next) {
+function error404(err, res, req, next) {
   var err = new Error('Not Found')
   err.status = 404
   console.log(chalk.red('hey dude - you have an error'))
@@ -141,26 +152,42 @@ consumeSQS.on('error', (err) => {
   console.error('ERROR during consumeSQS: ' + err.message)
 })
 
-const dbNewPost = (parsedMessage, deptId) => {
-  axios.post(`http://0.0.0.0:8080/api/incidents/${deptId}`, {
-    formatted: {
-      inc: parsedMessage.data,
-      incStatus: parsedMessage.data.inc_status,
-      incRemark: parsedMessage.data.inc_remarks,
-      incAssignment: parsedMessage.data.inc_assignment
-  }
-  })
-    .then(function (response) {
-    console.log(response);
-  })
-    .catch(function (error) {
-    console.log(error);
-  });
+const dbNewPost = (parsedMessage) => {
+    console.log('parsedMessage: ', parsedMessage)
+  axios.post(`http://0.0.0.0:8080/api/incidents/new`, {
+        dept_id: parsedMessage.data.dept_id,
+        // data: parsedMessage.data
+        data: {
+          inc: parsedMessage.data,
+          incStatus: parsedMessage.data.inc_status,
+          incRemark: {
+            inc_id: parsedMessage.data.incidentNum,
+            remark: parsedMessage.data.inc_remarks,
+          },
+          incAssignment: {
+            inc_id: parsedMessage.data.incidentNum,
+            assignment: parsedMessage.data.inc_assignment,
+          }
+        }
+    })
+    .then(function(response) {
+      console.log(response);
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
 }
 
-const dbUpdatePost = (parsedMessage, deptId) => {
-  // if an update, what route do we hit?
-  // incidents PATCH ?
+const dbUpdatePost = (parsedMessage) => {
+    // console.log('parsedMessage: ', parsedMessage)
+  axios.post(`http://0.0.0.0:8080/api/incidents/assignment`, {
+    })
+    .then(function(response) {
+      console.log(response);
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
 }
 
 consumeSQS.on('message_received', (message) => {
@@ -168,9 +195,9 @@ consumeSQS.on('message_received', (message) => {
   let deptId = parseInt(message.MessageAttributes.departId.StringValue)
   try {
     if (parsedMessage.pubType === 'new') {
-      dbNewPost(parsedMessage, deptId)
-    } else if (parsedMessage.pubType === 'update') {
-      dbUpdatePost(parsedMessage, deptId)
+      dbNewPost(parsedMessage)
+    } else if (parsedMessage.pubType === 'assignment') {
+      // dbUpdatePost(parsedMessage)
     } else {
       console.error('Unknown type of POST')
     }
