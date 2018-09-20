@@ -121,13 +121,15 @@ incidents.post('/:incType', async (req, res, next) => {
     // store inc_remark details
     let incRemark = { 
       inc_id: '',
-      remark: body.incRemark + ''
+      remark: body.incRemark.remark + ''
     }
     // store inc_assignment details
     let incAssignment = {
       inc_id: '',
-      assignment: body.incAssignment + ''
+      assignment: body.incAssignment.assignment + ''
     }
+ 
+    
 
     // insert inc_status
     let incStatusId = await ctrl.incStatus.saveIncStatus(incStatus)

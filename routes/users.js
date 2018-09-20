@@ -135,6 +135,7 @@ users.delete('/:userId', async (req, res, next) => {
   // skip this function if :userId is 'track'
   if (req.params.userId === 'track') {
     next()
+    return
   } else {
     let userId = req.params.userId
 
@@ -163,7 +164,9 @@ users.delete('/:userId', async (req, res, next) => {
 })
 
 users.delete('/track', async (req, res, next) => {
-
+  console.log('INSIDE DELETE TRACKWUSSADEAL');
+  
+  
   let bodyDetails = JSON.parse(req.body)
   let result;
   if (DEBUG) console.log(`👉 DELETE api/users/track body\n${JSON.stringify(bodyDetails, null, 4)}`)

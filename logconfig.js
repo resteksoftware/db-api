@@ -17,7 +17,7 @@ module.exports = {
     stations: false,
     track_user_apparatus: false,
     track_user_stations: false,
-    users: false,
+    users: true,
     util: {
       sendEmailMailgun: false,
       sendEmailPooledRustybear: false,
