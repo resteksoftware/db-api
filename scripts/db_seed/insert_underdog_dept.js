@@ -220,6 +220,12 @@ let apparatus = [
         // needs sta_id
     },
     {
+        app_abbr : 'U3',
+        app_name : 'Utility 3',
+        is_enabled : true
+        // needs sta_id
+    },
+    {
         app_abbr : 'L5',
         app_name : 'Ladder 5',
         is_enabled : true
@@ -334,8 +340,7 @@ const seedUnderdog = async () => {
             let appAbbr = stationApparatusMapping[sta.sta_abbr][j]
             let appToInsert;
             // iterate across available apparatus
-            apparatus.forEach(app => {
-
+                apparatus.forEach(app => {
                 // set app if apparatus shares same app_abbr in station apparatus mapping
                 if (app.app_abbr === appAbbr) {
                     appToInsert = app

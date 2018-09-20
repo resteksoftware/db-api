@@ -193,7 +193,6 @@ const deleteUserFromDepartment = (deptId, userId) => {
 
 // deleteUserFromStation: removes user from Station. also removes user from Station's apparatus
 const deleteUserFromStation = (staId, userId, staApps) => {
-  console.log(staApps);
   let appsToRemove = []
   staApps.forEach(app => appsToRemove.push(app.app_id))
 
@@ -228,7 +227,7 @@ const deleteUserFromStation = (staId, userId, staApps) => {
 
 // deleteUserFromApparatus: removes user from Apparatus
 const deleteUserFromApparatus = (appId, userId) => {
-return db.track_user_apparatus.destroy({
+  return db.track_user_apparatus.destroy({
     where: {
       app_id: appId,
       user_id: userId
