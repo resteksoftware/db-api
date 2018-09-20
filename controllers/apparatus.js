@@ -23,8 +23,6 @@ const getAppById = (appId) => {
 
 // getAllApparatus: returns all apparatuses matching sta_id
 const getAllAppsByStaId = (staId) => {
-  console.log('🔥');
-  console.log(staId);
   
   return db.apparatus.findAll({
     where: {
@@ -35,12 +33,7 @@ const getAllAppsByStaId = (staId) => {
     ],
     raw: true
   })
-  .then(result=> {
-    
-    console.log('🐸🐸🐸🐸🐸🐸');
-    console.log(result);
-    
-    return result})
+  .then(result => result)
   .catch(err => err)
 }
 
