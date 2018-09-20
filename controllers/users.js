@@ -144,15 +144,25 @@ return db.track_user_departments.create(record)
   
 }
 
-// saveUserToStation: associates a user to a department
-const saveUserToStation = (staId, userId) => {
+// saveUserToStation: associates a user to a station, as well as the station's apparatus
+const saveUserToStation = (staId, userId, staApps) => {
   let record = {
     sta_id: staId,
     user_id: userId
   }
+
+  let appsToAdd = staApps.map(app => {
+    return {
+      app_id: app.app_id,
+      user_id: userId
+    }
+  })
   
-return db.track_user_stations.create(record)
-.then( response => response.id)
+return db.track_user_apparatus.bulkCreate(appsToAdd)
+.then(resp => db.track_user_stations.create(record) )
+.then(response => response.id)
+
+
 .catch( err => err )
   
 }
@@ -181,16 +191,39 @@ const deleteUserFromDepartment = (deptId, userId) => {
 }
 
 
-// deleteUserFromStation: removes user from Station
-const deleteUserFromStation = (staId, userId) => {
-  return db.track_user_stations.destroy({
+// deleteUserFromStation: removes user from Station. also removes user from Station's apparatus
+const deleteUserFromStation = (staId, userId, staApps) => {
+  console.log(staApps);
+  let appsToRemove = []
+  staApps.forEach(app => appsToRemove.push(app.app_id))
+
+  return db.track_user_apparatus.destroy({
+    where: {
+      [Op.and] : [
+        {
+          user_id: userId
+        },
+        {
+          app_id: {
+            [Op.in] : appsToRemove
+          }
+        }
+      ]
+    }
+  })
+  .then (resp => resp )
+  .then ( resp => {
+    return db.track_user_stations.destroy({
       where: {
         sta_id: staId,
         user_id: userId
       }
     })
-    .then( response => 'association deleted between station and user' )
-    .catch(err => err )
+  })
+  .then( response => 'association deleted between station and user' )
+  .catch(err => err )
+  
+
 }
 
 // deleteUserFromApparatus: removes user from Apparatus

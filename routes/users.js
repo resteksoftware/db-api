@@ -115,7 +115,12 @@ users.post('/track', async (req, res, next) => {
   if (bodyDetails.app_id) {
     trackId = await ctrl.user.saveUserToApparatus(bodyDetails.app_id, bodyDetails.user_id)
   } else if (bodyDetails.sta_id) {
-    trackId = await ctrl.user.saveUserToStation(bodyDetails.sta_id, bodyDetails.user_id)
+    let staApps = await ctrl.app.getAllAppsByStaId(bodyDetails.sta_id)
+    console.log('THESE ARE THE APPS THAT BELONG TO THE STATION');
+    console.log(staApps);
+    
+    
+    trackId = await ctrl.user.saveUserToStation(bodyDetails.sta_id, bodyDetails.user_id, staApps)
   } else if (bodyDetails.dept_id) {
     trackId = await ctrl.user.saveUserToDepartment(bodyDetails.dept_id, bodyDetails.user_id)
   } else {
@@ -164,8 +169,6 @@ users.delete('/:userId', async (req, res, next) => {
 })
 
 users.delete('/track', async (req, res, next) => {
-  console.log('INSIDE DELETE TRACKWUSSADEAL');
-  
   
   let bodyDetails = JSON.parse(req.body)
   let result;
@@ -173,7 +176,8 @@ users.delete('/track', async (req, res, next) => {
   if (bodyDetails.app_id) {
     result = await ctrl.user.deleteUserFromApparatus(bodyDetails.app_id, bodyDetails.user_id)
   } else if (bodyDetails.sta_id) {
-    result = await ctrl.user.deleteUserFromStation(bodyDetails.sta_id, bodyDetails.user_id)
+    let staApps = await ctrl.app.getAllAppsByStaId(bodyDetails.sta_id)
+    result = await ctrl.user.deleteUserFromStation(bodyDetails.sta_id, bodyDetails.user_id, staApps)
   } else if (bodyDetails.dept_id) {
     result = await ctrl.user.deleteUserFromDepartment(bodyDetails.dept_id, bodyDetails.user_id)
   } else {
