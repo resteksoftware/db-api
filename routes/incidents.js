@@ -69,19 +69,19 @@ incidents.get('/:deptId/:slug/:userId', async (req, res) => {
 
 /**
  * Process incoming incident. example inputs:
- * 
+ *
  * endpoint: /api/incidents/new
- * req.body: { 
+ * req.body: {
  *  dept_id: deptId,
  *  data: {
  *    inc: { incident info },
  *    incStatus: { incident status info },
  *    incRemark: { incident remark info },
- *    incAssignment: { incident assignment info } 
+ *    incAssignment: { incident assignment info }
  *  }
  * }
  * NOTE: dept_id is required for insertion of incident
- * 
+ *
  * endpoint: /api/incidents/assignment
  * req.body: {
  *  inc_id: incId,
@@ -90,7 +90,7 @@ incidents.get('/:deptId/:slug/:userId', async (req, res) => {
  *  }
  * }
  * NOTE: inc_id is required for insertion of assignment
- * 
+ *
  * endpoint: /api/incidents/remark
  * req.body: {
  *  inc_id: incId,
@@ -104,29 +104,34 @@ incidents.get('/:deptId/:slug/:userId', async (req, res) => {
 
 incidents.post('/:incType', async (req, res, next) => {
   const incType = req.params.incType;
-  let body = JSON.parse(req.body).data;
-  let deptId = JSON.parse(req.body).dept_id
+  let body = JSON.parse(req.body)
+  let deptId = JSON.parse(req.body).data.inc.dept_id
   let incId = body.inc_id || false
 
   // incident is completely new
   if (incType === 'new') {
     // store incident details
-    let inc = body.inc
+    let inc = body.data.inc
     // stringify inc properties
     inc.dept_id = deptId
     inc.hot_zone = JSON.stringify(inc.hot_zone)
     inc.warm_zone = JSON.stringify(inc.warm_zone)
+
     // store inc_status details
-    let incStatus = body.incStatus
+    // let incStatus = body.data.incStatus
+    let incStatus = JSON.stringify(inc.inc_status)
+
     // store inc_remark details
-    let incRemark = { 
+    let incRemark = {
       inc_id: '',
-      remark: body.incRemark + ''
+      remark: JSON.stringify(inc.inc_remarks) + ''
+      // remark: body.data.incRemark + ''
     }
     // store inc_assignment details
     let incAssignment = {
       inc_id: '',
-      assignment: body.incAssignment + ''
+      assignment: JSON.stringify(inc.inc_assignment) + ''
+      // assignment: body.data.incAssignment + ''
     }
 
     // insert inc_status
@@ -174,10 +179,10 @@ incidents.post('/:incType', async (req, res, next) => {
 
       res.send({ inc_remark_id: incRemarkId })
     }
-    
+
   } else {
 
-    res.send({ data: 'error' }) 
+    res.send({ data: 'error' })
   }
 
 })
@@ -192,10 +197,10 @@ incidents.patch('/:incStatusId', async (req, res, next) => {
   if (body.inc_id && !incStatusId) {
     update = body.data
     incStatusId = await ctrl.inc.getIncStatusByIncId(incId)
-  } 
+  }
 
   let response = await ctrl.incStatus.updateIncStatus(incStatusId, update)
-  
+
   res.send(update)
 
 })
@@ -208,6 +213,6 @@ incidents.delete('/:incId', async (req, res, next) => {
   res.send(response)
 })
 
- 
+
 
 module.exports = incidents
