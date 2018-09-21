@@ -242,8 +242,8 @@ describe('API/RESPONSES', function() {
         if (err) console.log(err);
         expect(res.body).to.have.property('users')
         expect(res.body).to.have.property('apps')
-        respUserId = res.body.users.resp_user_id
-        respAppId = res.body.apps.resp_app_id
+        respUserId = res.body.users[0].resp_user_id
+        respAppId = res.body.apps[0].resp_app_id
         
         done()
       })

@@ -34,13 +34,13 @@ const getRespAppByAppId = (appId) => {
 }
 
 const getRespAppByIncId = (incId) => {
-    return db.responses_apparatus.findOne({
+    return db.responses_apparatus.findAll({
         where: {
             inc_id: incId
         },
         raw: true
     })
-    .then(app => app)
+    .then(apps => apps)
     .catch(err => err)
 }
 

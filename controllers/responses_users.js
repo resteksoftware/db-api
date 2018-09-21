@@ -34,13 +34,14 @@ const getRespUserByUserId = (userId) => {
 }
 
 const getRespUserByIncId = (incId) => {
-    return db.responses_users.findOne({
-        where: {
-            inc_id: incId
-        },
-        raw: true
-    })
-    .then( app => app )
+    return db.sequelize.query(`
+    SELECT * 
+        FROM responses_users AS ru
+        RIGHT JOIN users 
+        ON ru.user_id=users.user_id
+        WHERE inc_id=${incId}`,
+        { type: db.sequelize.QueryTypes.SELECT })
+    .then( respUser => respUser)
     .catch( err => err )
 }
 
