@@ -1,6 +1,6 @@
 /**
-/* Module for calls.
- * @module routes/calls
+/* Module for incidents.
+ * @module routes/incidents
  */
 
 const express = require('express')
@@ -18,16 +18,25 @@ const DEBUG = require('../logconfig').routes.incidents // Set this to 'true' to 
  * @returns {array} Call objects in an array.
  */
 incidents.get('/', async (req, res) => {
-  let body = JSON.parse(req.body)
-  if (DEBUG) console.log(`👉 GET api/incidents/ \n body: ${JSON.stringify(body, null, 2)}`);
-  let incRes;
-  if (body.inc_id) {
-    incRes = await ctrl.inc.getIncById(body.inc_id)
-    res.send(incRes)
-  } else if (body.dept_id){
-    incRes = await ctrl.inc.getAllIncsByDeptId(body.dept_id)
-    res.send(incRes)
+  if (req.query) {
+    if (Object.keys(req.query).includes('fireId')) {
+      let inc = await ctrl.inc.getIncByFireDispatchId(req.query.fireId)
+      res.send(inc)
+    }
   }
+
+  // // TODO: this should be revised. should not use req.body with GET
+  // let body = JSON.parse(req.body)
+  // if (DEBUG) console.log(`👉 GET api/incidents/ \n body: ${JSON.stringify(body, null, 2)}`);
+  // let incRes;
+  // if (body.inc_id) {
+  //   incRes = await ctrl.inc.getIncById(body.inc_id)
+  //   res.send(incRes)
+  // } else if (body.dept_id){
+  //   incRes = await ctrl.inc.getAllIncsByDeptId(body.dept_id)
+  //   res.send(incRes)
+  // }
+
 })
 
 /**
@@ -105,15 +114,14 @@ incidents.get('/:deptId/:slug/:userId', async (req, res) => {
 incidents.post('/:incType', async (req, res, next) => {
   const incType = req.params.incType;
   let body = JSON.parse(req.body)
-  let deptId = JSON.parse(req.body).data.inc.dept_id
   let incId = body.inc_id || false
 
   // incident is completely new
   if (incType === 'new') {
     // store incident details
     let inc = body.data.inc
+    let deptId = JSON.parse(req.body).dept_id
     // stringify inc properties
-    inc.dept_id = deptId
     inc.hot_zone = JSON.stringify(inc.hot_zone)
     inc.warm_zone = JSON.stringify(inc.warm_zone)
 
@@ -124,12 +132,13 @@ incidents.post('/:incType', async (req, res, next) => {
     // store inc_remark details
     let incRemark = {
       inc_id: '',
-      remark: JSON.stringify(inc.inc_remarks) + ''
+      remark: inc.inc_remarks
     }
     // store inc_assignment details
     let incAssignment = {
       inc_id: '',
-      assignment: JSON.stringify(inc.inc_assignment) + ''
+      // assignment: JSON.stringify(inc.inc_assignment) + ''
+      assignment: inc.inc_assignment
     }
 
     // insert inc_status
@@ -143,7 +152,6 @@ incidents.post('/:incType', async (req, res, next) => {
     // insert inc_assignment
     let incAssignmentId = await ctrl.incAssignment.saveIncAssignment(incAssignment)
 
-
     res.send({
       inc_id: newIncId,
       inc_status_id: incStatusId,
@@ -154,32 +162,73 @@ incidents.post('/:incType', async (req, res, next) => {
     return
 
   // incident is an update to assignment (new record)
-  } else if (incType === 'assignment') {
-    if (incId) {
-      let incAssignment = {
-        inc_id: incId,
-        assignment: body.incAssignment
+  } else if (incType === 'assignment' ||
+             incType === 'status' ||
+             incType === 'radio_freq' ||
+             incType === 'remark') {
+    let fdIncId = body.data.inc_id
+    let inc = await ctrl.inc.getIncByFireDispatchId(fdIncId)
+
+    if (incType === 'assignment') {
+      let assignment = body.data.incAssignment
+      if (inc.inc_id) {
+        let incAssignment = {
+          inc_id: inc.inc_id,
+          assignment: assignment
+        }
+        let incAssignmentId = await ctrl.incAssignment.saveIncAssignment(incAssignment)
+        res.send({ inc_assignment_id: incAssignmentId })
       }
-
-      let incAssignmentId = await ctrl.incAssignment.saveIncAssignment(incAssignment)
-
-      res.send({ inc_assignment_id: incAssignmentId })
     }
-  // incident is an update to remark (new record)
-  } else if (incType === 'remark') {
-    if (incId) {
-      let incRemark = {
-        inc_id: incId,
-        remark: body.incRemark
+
+    // incident is an update to remark (new record)
+    if (incType === 'remark') {
+      let remark = body.data.incRemark
+      if (inc.inc_id) {
+        let incRemark = {
+          inc_id: inc.inc_id,
+          remark: remark
+        }
+        let incRemarkId = await ctrl.incRemark.saveIncRemark(incRemark)
+        res.send({ inc_remark_id: incRemarkId })
+      }
+    }
+
+    // incident is an update to status (patch a record)
+    if (incType === 'status') {
+      let update = {}
+      let incStatusObj = body.data
+      let incidentStatus = await ctrl.incStatus.getIncStatusByIncId(inc.inc_id)
+      let incStatusId = incidentStatus.dataValues.inc_status_id
+      let status = incStatusObj.incStatus  // i.e. ACTIVE or PENDING
+      let updateTimeStamp = incStatusObj.updateTimeStamp
+
+      if (status === 'pending' || status === 'PENDING') {
+        update.pending = updateTimeStamp
+      } else if (status === 'active' || status === 'ACTIVE') {
+        update.active = updateTimeStamp
+      } else if (status === 'closed' || status === 'CLOSED') {
+        update.closed = updateTimeStamp
+      } else if (status === 'cancelled' || status === 'CANCELLED') {
+        update.cancelled = updateTimeStamp
+      } else if (status === 'filed' || status === 'FILED') {
+        update.filed = updateTimeStamp
+      } else {
+        console.error(`ERROR: Cannot update incident_statuses: status type not known`)
       }
 
-      let incRemarkId = await ctrl.incRemark.saveIncRemark(incRemark)
+      if (incStatusId) {
+        // patch the inc status
+        let result = await ctrl.incStatus.updateIncStatus(incStatusId, update)
+        res.send({ inc_status_id: result })
+      }
+    }
 
-      res.send({ inc_remark_id: incRemarkId })
+    if (incType === 'radio_freq') {
+      console.error(`ERROR: Not tracking radio_freq changes yet`)
     }
 
   } else {
-
     res.send({ data: 'error' })
   }
 

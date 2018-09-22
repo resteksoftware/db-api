@@ -27,22 +27,25 @@ module.exports = (sequelize, DataTypes) => {
       onscene_resp_timestamp: {
         type: Sequelize.DATE,
         allowNull: true,
-        defaultValue: false
+        defaultValue: null
       },
       onscene_resp_gps: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: null
+        // defaultValue: null
+        defaultValue: false
       },
       closing_resp_timestamp: {
         type: Sequelize.DATE,
         allowNull: true,
         defaultValue: false
+        // defaultValue: null
       },
       closing_resp_gps: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: null
+        defaultValue: false
+        // defaultValue: null
       }
     },
     {

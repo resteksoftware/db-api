@@ -59,7 +59,7 @@ const getIncStatusByIncId = (incId) => {
   .catch (err => console.error(err))
 }
 
-// getAllIncidentss: returns all incidents by deptId
+// getAllIncidents: returns all incidents by deptId
 const getAllIncsByDeptId = (deptId) => {
 
   // get incident joined with
@@ -72,6 +72,24 @@ const getAllIncsByDeptId = (deptId) => {
   .then( incidents => incidents )
   .catch( err => err )
 
+}
+
+/**
+ * Get incident by fire dispatch ID
+ * @param {string} fireDispatchId - dispatch ID from client.
+ * @returns {object} an incident object.
+ */
+const getIncByFireDispatchId = (fireDispatchId) => {
+  return db.incidents.findAll({
+    where: {
+      fd_dispatch_id: fireDispatchId
+    },
+    raw: true
+  })
+  .then( incident => incident[0] )
+  .catch( err => {
+    console.error(`ERROR: ${err}`)
+  })
 }
 
 const getIncByDeptIdAndSlug = (deptId, slug) => {
@@ -133,7 +151,7 @@ const deleteInc = (incId) => {
     },
     raw: true
   })
-  // inc_remarks, 
+  // inc_remarks,
   .then( resp => {
     return db.incident_remarks.destroy({
       where: {
@@ -154,9 +172,9 @@ const deleteInc = (incId) => {
         incStatusId = resp.inc_status_id
         return resp.inc_status_id
       })
-      
+
   })
-  //inc, 
+  //inc,
   .then( resp => {
     return db.incidents.destroy({
       where: { inc_id: incId },
@@ -191,11 +209,10 @@ const deleteAllInc = (incIdArr) => {
     .catch(err => err)
 }
 
-// getIncById(36)
-
 module.exports = {
   getIncById            : getIncById,
   getIncByDeptIdAndSlug : getIncByDeptIdAndSlug,
+  getIncByFireDispatchId: getIncByFireDispatchId,
   getAllIncsByDeptId    : getAllIncsByDeptId,
   getRecentIncsByDeptId : getRecentIncsByDeptId,
   getIncStatusByIncId   : getIncStatusByIncId,
@@ -203,5 +220,4 @@ module.exports = {
   saveAllIncs           : saveAllIncs,
   deleteInc             : deleteInc,
   deleteAllInc          : deleteAllInc
-  
 }

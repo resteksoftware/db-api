@@ -153,10 +153,8 @@ consumeSQS.on('error', (err) => {
 })
 
 const dbNewPost = (parsedMessage) => {
-    console.log('parsedMessage: ', parsedMessage)
   axios.post(`http://0.0.0.0:8080/api/incidents/new`, {
         dept_id: parsedMessage.data.dept_id,
-        // data: parsedMessage.data
         data: {
           inc: parsedMessage.data,
           incStatus: parsedMessage.data.inc_status,
@@ -178,9 +176,10 @@ const dbNewPost = (parsedMessage) => {
     });
 }
 
-const dbUpdatePost = (parsedMessage) => {
-    // console.log('parsedMessage: ', parsedMessage)
-  axios.post(`http://0.0.0.0:8080/api/incidents/assignment`, {
+const dbUpdatePost = (parsedMessage, pubType) => {
+  axios.post(`http://0.0.0.0:8080/api/incidents/${pubType}`, {
+        dept_id: parsedMessage.data.dept_id,
+        data: parsedMessage.data
     })
     .then(function(response) {
       console.log(response);
@@ -196,8 +195,11 @@ consumeSQS.on('message_received', (message) => {
   try {
     if (parsedMessage.pubType === 'new') {
       dbNewPost(parsedMessage)
-    } else if (parsedMessage.pubType === 'assignment') {
-      // dbUpdatePost(parsedMessage)
+    } else if (parsedMessage.pubType === 'assignment' ||
+               parsedMessage.pubType === 'status' ||
+               parsedMessage.pubType === 'radio_freq' ||
+               parsedMessage.pubType === 'remark') {
+      dbUpdatePost(parsedMessage, parsedMessage.pubType)
     } else {
       console.error('Unknown type of POST')
     }

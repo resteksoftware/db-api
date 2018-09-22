@@ -21,9 +21,12 @@ const getIncStatusById = (incStatusId) => {
     .catch( err => err )
 }
 
-// getIncidentsStatusByIncidentId: returns incidentStatus by inc_id
+/**
+ * Get a specific incident status entry
+ * @param {number} incId - the incident ID used in the DB (primary key).
+ * @returns {object} incidentStatus - the incident status entry
+ */
 const getIncStatusByIncId = (incId) => {
-  // get incident that matches id
   return db.incidents.findOne({
       where: {
         inc_id: incId
@@ -38,8 +41,9 @@ const getIncStatusByIncId = (incId) => {
       })
     })
     .then( incidentStatus => incidentStatus )
-    .catch( err => err )
-
+    .catch( err => {
+      console.error(`ERROR in getIncStatusIdByIncId:  + ${err}`)
+    })
 }
 
 // saveIncident: saves incident and returns new incident_id
@@ -57,9 +61,15 @@ const saveAllIncStatuses = (incidentStatusColl) => {
     .catch( err => err )
 }
 
-// updateIncStatus
+/**
+ * Update a specific incident status entry with a timestamp
+ * @param {number} incStatusId - the incident status ID to be updated.
+ * @param {object} incStatusUpdate - key/value pair with value = timestamp.
+ * @returns {array} updatedStatus - an array with item count and incident status object(s)
+ */
 const updateIncStatus = (incStatusId, incStatusUpdate) => {
-  return db.incident_statuses.update(incStatusUpdate,
+  return db.incident_statuses.update(
+    incStatusUpdate,
   {
     returning: true,
     raw: true,
@@ -68,7 +78,9 @@ const updateIncStatus = (incStatusId, incStatusUpdate) => {
     }
   })
   .then(updatedStatus => updatedStatus)
-  .catch(err => err)
+  .catch(err => {
+    console.error(`ERROR in updateIncStatus: ${err}`)
+  })
 }
 
 // updateAllApparatus
