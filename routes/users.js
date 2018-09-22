@@ -30,9 +30,10 @@ users.get('/:type/:id', async (req, res, next) => {
 
   if (type === 'user-id') {
     userRes = await ctrl.user.getAllUsersByIds(id).then(resp => resp[0])
-    // let userResponseData = await ctrl.respUser.getRespUserByUserId(userId)
+    let userResponseData = await ctrl.respUser.getRespUserByUserId(userId)
+    userRes.responses = userResponseData
   } else if (type === 'sta-id') {
-    userRes = await ctrl.user.getAllUsersByStationIds(id)
+    userRes = await ctrl.user.getAllUsersByStationIds(id) // TODO: consider if i need to add response data to this stuff (nfd)
   } else if (type === 'app-id') {
     userRes = await ctrl.user.getAllUsersByApparatusIds(id)
   } else if (type === 'dept-id'){
