@@ -29,9 +29,20 @@ users.get('/:type/:id', async (req, res, next) => {
   let userRes;
 
   if (type === 'user-id') {
-    userRes = await ctrl.user.getAllUsersByIds(id).then(resp => resp[0])
-    let userResponseData = await ctrl.respUser.getRespUserByUserId(userId)
-    userRes.responses = userResponseData
+    // fetch user by id
+    userRes = await ctrl.user.getAllUsersByIds(id).then(users => {      
+      let output = users[0]
+      // fetch user responses
+      return ctrl.respUser.getRespUserByUserId(id).then(userResp => {
+        // if user exists, add user responses to output
+        if (output) {
+          output.responses = userResp
+          return output
+        } else {
+          return users[0]
+        }
+      })
+    })
   } else if (type === 'sta-id') {
     userRes = await ctrl.user.getAllUsersByStationIds(id) // TODO: consider if i need to add response data to this stuff (nfd)
   } else if (type === 'app-id') {
