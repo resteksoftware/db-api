@@ -213,8 +213,7 @@ describe('API/RESPONSES', function() {
       let userId = [...userIds][0]
       if (DEBUG) console.log(`👉 [TEST] GET API/RESPONSES user_id: ${userId}`)
       request(server)
-      .get('/api/responses')
-      .send({user_id: userId})
+      .get(`/api/responses/user-id/${userId}`)
       .end(function(err, res) {
         if (err) console.log(err);
         expect(res.body).to.have.property('data')
@@ -225,8 +224,7 @@ describe('API/RESPONSES', function() {
     it('should get all responses for one apparatus', function(done) {
       let appId = [...appIds][0]
       request(server)
-      .get('/api/responses')
-      .send({app_id: appId})
+      .get(`/api/responses/app-id/${appId}`)
       .end(function(err, res) {
         if (err) console.log(err);
         expect(res.body).to.have.property('data')
@@ -236,14 +234,13 @@ describe('API/RESPONSES', function() {
 
     it('should get all responses for one incident', function(done) {
       request(server)
-      .get('/api/responses')
-      .send({inc_id: incId})
+      .get(`/api/responses/inc-id/${incId}`)
       .end(function(err, res) {
         if (err) console.log(err);
-        expect(res.body).to.have.property('users')
-        expect(res.body).to.have.property('apps')
-        respUserId = res.body.users[0].resp_user_id
-        respAppId = res.body.apps[0].resp_app_id
+        expect(res.body).to.have.property('resp_user')
+        expect(res.body).to.have.property('resp_app')
+        respUserId = res.body.resp_user[0].resp_user_id
+        respAppId = res.body.resp_app[0].resp_app_id
         
         done()
       })
@@ -292,8 +289,7 @@ describe('API/RESPONSES', function() {
 
     it('should not fetch deleted response', function(done) {
       request(server)
-      .get('/api/responses')
-      .send({user_id: [...userIds][0]})
+      .get(`/api/responses/user-id/${[...userIds][0]}`)
       .expect(200)
       .end(function(err, res) {
         if (err) console.log(err);
@@ -316,8 +312,7 @@ describe('API/RESPONSES', function() {
 
     it('should not fetch deleted apparatus response', function(done) {
       request(server)
-      .get('/api/responses')
-      .send({app_id: [...appIds][0]})
+      .get(`/api/responses/user-id/${[...userIds][0]}`)
       .expect(200)
       .end(function(err, res) {
         if (err) console.log(err);

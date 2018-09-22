@@ -11,25 +11,24 @@ const DEBUG = require('../logconfig').routes.responses
 /**
  * Returns response 
  */
-responses.get('/', async (req, res, next) => {
-  let body = JSON.parse(req.body)
+responses.get('/:type/:id', async (req, res, next) => {
+  let type = req.params.type
+  let id = req.params.id
   
   if (DEBUG) console.log(`👉 GET '/' \nbody: ${JSON.stringify(body, null, 2)}`);
   let response;
-  if (body.resp_user_id) {
-    response = { data: await ctrl.respUser.getRespUserById(body.resp_user_id) }
-  } else if (body.resp_app_id) {
-    response = { data: await ctrl.respUser.getRespUserById(body.resp_app_id) }
-  }else if (body.resp_app_id) {
-    response = { data: await ctrl.respApp.getRespAppById(body.resp_app_id) }
-  } else if (body.user_id) {
-    response = { data: await ctrl.respUser.getRespUserByUserId(body.user_id) }
-  } else if (body.app_id) {
-    response = { data: await ctrl.respApp.getRespAppByAppId(body.app_id) }
-  } else if (body.inc_id) {
+  if (type === 'resp-user-id') {
+    response = { data: await ctrl.respUser.getRespUserById(id) } 
+  } else if (type === 'resp-app-id') {
+    response = { data: await ctrl.respApp.getRespAppById(id) }
+  } else if (type === 'user-id') {
+    response = { data: await ctrl.respUser.getRespUserByUserId(id) }
+  } else if (type === 'app-id') {
+    response = { data: await ctrl.respApp.getRespAppByAppId(id) }
+  } else if (type === 'inc-id') {
     response = {
-      users: await ctrl.respUser.getRespUserByIncId(body.inc_id),
-      apps: await ctrl.respApp.getRespAppByIncId(body.inc_id)
+      resp_user: await ctrl.respUser.getRespUserByIncId(id),
+      resp_app: await ctrl.respApp.getRespAppByIncId(id)
     }
   } else {
     response = 'error'
@@ -37,6 +36,33 @@ responses.get('/', async (req, res, next) => {
   res.send(response)
 
 })
+/**
+ * Returns response 
+ */
+// responses.get('/', async (req, res, next) => {
+//   let body = JSON.parse(req.body)
+  
+//   if (DEBUG) console.log(`👉 GET '/' \nbody: ${JSON.stringify(body, null, 2)}`);
+//   let response;
+//   if (body.resp_user_id) {
+//     response = { data: await ctrl.respUser.getRespUserById(body.resp_user_id) } 
+//   } else if (body.resp_app_id) {
+//     response = { data: await ctrl.respApp.getRespAppById(body.resp_app_id) }
+//   } else if (body.user_id) {
+//     response = { data: await ctrl.respUser.getRespUserByUserId(body.user_id) }
+//   } else if (body.app_id) {
+//     response = { data: await ctrl.respApp.getRespAppByAppId(body.app_id) }
+//   } else if (body.inc_id) {
+//     response = {
+//       users: await ctrl.respUser.getRespUserByIncId(body.inc_id),
+//       apps: await ctrl.respApp.getRespAppByIncId(body.inc_id)
+//     }
+//   } else {
+//     response = 'error'
+//   }
+//   res.send(response)
+
+// })
 
 
 responses.post('/:userOrApp', async (req, res, next) => { 
