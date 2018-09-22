@@ -26,6 +26,7 @@ ENV PATH=/usr/src/node_modules/.bin:$PATH \
 ADD . .
 
 # RUN mkdir /usr/src/dist
+EXPOSE 8080
 
 # start app
 CMD ["npm", "start"]
