@@ -249,11 +249,9 @@ describe('API/USERS', function() {
   describe('GET "/"', function(done) {
 
     it('should get users matching department_id', function (done) {
-      let bodyDetails = {dept_id: deptId}
 
        request(server)
-          .get(`/api/users/`)
-          .send(bodyDetails)
+          .get(`/api/users/dept-id/${deptId}`)
           .expect(200)
           .end(function(err, res) {
             if (err) console.log(err);
@@ -288,12 +286,10 @@ describe('API/USERS', function() {
       })
 
       it('should get users matching sta_id', function(done) {
-        let bodyDetails = { sta_id: staId }
         let userIdArr = [...userIds]
 
         request(server)
-        .get(`/api/users/`)
-        .send(bodyDetails)
+        .get(`/api/users/sta-id/${staId}`)
         .expect(200)
         .end(function(err, res) {
           if (err) console.log(err)
@@ -306,30 +302,10 @@ describe('API/USERS', function() {
       })
 
       it('should get users matching app_id', function(done) {
-        let bodyDetails = { app_id: appId }
         let userIdArr = [...userIds]
 
         request(server)
-        .get(`/api/users/`)
-        .send(bodyDetails)
-        .expect(200)
-        .end(function(err, res) {
-          if (err) console.log(err)
-          expect(res.body).to.be.an('array')
-          expect(res.body[0]).to.have.property('user_id').that.is.a('number')
-          expect(appId).to.equal(res.body[0].app_id)
-          expect(userIdArr[0]).to.equal(res.body[0].user_id)
-          done()
-        })
-      })
-
-      it('should get users matching app_id', function(done) {
-        let bodyDetails = { app_id: appId }
-        let userIdArr = [...userIds]
-
-        request(server)
-        .get(`/api/users/`)
-        .send(bodyDetails)
+        .get(`/api/users/app-id/${appId}`)
         .expect(200)
         .end(function(err, res) {
           if (err) console.log(err)
@@ -345,21 +321,20 @@ describe('API/USERS', function() {
 
     describe('GET "/track', function(done) {
       it('should get all tracks based off user id', function (done) {
-        
         let userIdArr = [...userIds] 
 
         request(server)
-          .get(`/api/users/track/${userIdArr[0]}`)
-          .expect(200)
-          .end(function (err, res) {
-            if (err) console.log(err)
-            if (DEBUG) console.log(`👉 [TEST] GET '/track' \nbody: ${JSON.stringify(res.body, null, 2)}`);
-            expect(res.body).to.be.an('object')
-            expect(res.body).to.have.property('track_user_app').that.is.a('array')
-            expect(res.body).to.have.property('track_user_sta').that.is.a('array')
-            expect(res.body).to.have.property('track_user_dept').that.is.a('array')
-            done()
-          })
+        .get(`/api/users/track/${userIdArr[0]}`)
+        .expect(200)
+        .end(function (err, res) {
+          if (err) console.log(err)
+          if (DEBUG) console.log(`👉 [TEST] GET '/track' \nbody: ${JSON.stringify(res.body, null, 2)}`);
+          expect(res.body).to.be.an('object')
+          expect(res.body).to.have.property('track_user_app').that.is.a('array')
+          expect(res.body).to.have.property('track_user_sta').that.is.a('array')
+          expect(res.body).to.have.property('track_user_dept').that.is.a('array')
+          done()
+        })
       })
     })
 
@@ -402,11 +377,10 @@ describe('API/USERS', function() {
 
       it('should fail to retrieve deleted user', function(done) {
         request(server)
-        .get(`/api/users/`)
-        .send({user_id: usrIdx})
+        .get(`/api/users/user-id/${usrIdx}`)
         .expect(400)
         .end(function(err, res) {
-          expect(res.body).to.deep.equal([])
+          expect(res.body).to.deep.equal({})
           done()
         })
       })
@@ -428,18 +402,17 @@ describe('API/USERS', function() {
 
       it('should fail to retrieve deleted user', function (done) {
         request(server)
-        .get(`/api/users/`)
-        .send({ user_id: userIdToDelete[0] })
+        .get(`/api/users/user-id/${userIdToDelete[0]}`)
         .expect(400)
         .end(function (err, res) {
-          expect(res.body).to.deep.equal([])
+          expect(res.body).to.deep.equal({})
           request(server)
           .get(`/api/users/`)
           .send({ user_id: userIdToDelete[1] })
           .expect(400)
           .end(function (err, res) {
             if (DEBUG) console.log('👉 Deleting ', userIdToDelete);
-            expect(res.body).to.deep.equal([])
+            expect(res.body).to.deep.equal({})
             done()
           })
         })
@@ -508,8 +481,7 @@ describe('API/USERS', function() {
      let usersToDelete = [];
      // fetch all users created under dept
      request(server)
-     .get(`/api/users/`)
-     .send({dept_id: deptId})
+     .get(`/api/users/dept-id/${deptId}`)
      .expect(200)
      .end(function (err, res) {
        if (err) console.log(err);       

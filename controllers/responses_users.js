@@ -22,8 +22,8 @@ const getRespUserById = (RespUserId) => {
 }
 
 const getRespUserByUserId = (userId) => {
- 
-    return db.responses_users.findOne({
+    // TODO: limit query to most recent 20 responses or something (nfd)
+    return db.responses_users.findAll({
         where: {
             user_id: userId
         },

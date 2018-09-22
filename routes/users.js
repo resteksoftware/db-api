@@ -17,18 +17,26 @@ const DEBUG = require('../logconfig').routes.users
 /**
  * Returns user matching userId
  */
-users.get('/', async (req, res, next) => {
-  let body = JSON.parse(req.body)
+users.get('/:type/:id', async (req, res, next) => {
+  let type = req.params.type;
+  let id = req.params.id;
+
+  if (type === 'track') {
+    next()
+    return
+  }
+
   let userRes;
 
-  if (body.user_id) {
-    userRes = await ctrl.user.getAllUsersByIds(body.user_id)
-  } else if (body.sta_id) {
-    userRes = await ctrl.user.getAllUsersByStationIds(body.sta_id)
-  } else if (body.app_id) {
-    userRes = await ctrl.user.getAllUsersByApparatusIds(body.app_id)
-  } else if (body.dept_id){
-    userRes = await ctrl.user.getAllUsersByDeptId(body.dept_id)
+  if (type === 'user-id') {
+    userRes = await ctrl.user.getAllUsersByIds(id).then(resp => resp[0])
+    // let userResponseData = await ctrl.respUser.getRespUserByUserId(userId)
+  } else if (type === 'sta-id') {
+    userRes = await ctrl.user.getAllUsersByStationIds(id)
+  } else if (type === 'app-id') {
+    userRes = await ctrl.user.getAllUsersByApparatusIds(id)
+  } else if (type === 'dept-id'){
+    userRes = await ctrl.user.getAllUsersByDeptId(id)
   } else {
     userRes = {data: 'error'}
   }

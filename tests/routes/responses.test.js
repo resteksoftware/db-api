@@ -293,7 +293,7 @@ describe('API/RESPONSES', function() {
       .expect(200)
       .end(function(err, res) {
         if (err) console.log(err);
-        expect(res.body.data).to.deep.equal(null)
+        expect(res.body.data).to.deep.equal([])
         done()
       })
     })
@@ -316,7 +316,7 @@ describe('API/RESPONSES', function() {
       .expect(200)
       .end(function(err, res) {
         if (err) console.log(err);
-        expect(res.body.data).to.deep.equal(null)
+        expect(res.body.data).to.deep.equal([])
         done()
       })
     })

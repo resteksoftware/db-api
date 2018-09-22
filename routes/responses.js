@@ -36,34 +36,6 @@ responses.get('/:type/:id', async (req, res, next) => {
   res.send(response)
 
 })
-/**
- * Returns response 
- */
-// responses.get('/', async (req, res, next) => {
-//   let body = JSON.parse(req.body)
-  
-//   if (DEBUG) console.log(`👉 GET '/' \nbody: ${JSON.stringify(body, null, 2)}`);
-//   let response;
-//   if (body.resp_user_id) {
-//     response = { data: await ctrl.respUser.getRespUserById(body.resp_user_id) } 
-//   } else if (body.resp_app_id) {
-//     response = { data: await ctrl.respApp.getRespAppById(body.resp_app_id) }
-//   } else if (body.user_id) {
-//     response = { data: await ctrl.respUser.getRespUserByUserId(body.user_id) }
-//   } else if (body.app_id) {
-//     response = { data: await ctrl.respApp.getRespAppByAppId(body.app_id) }
-//   } else if (body.inc_id) {
-//     response = {
-//       users: await ctrl.respUser.getRespUserByIncId(body.inc_id),
-//       apps: await ctrl.respApp.getRespAppByIncId(body.inc_id)
-//     }
-//   } else {
-//     response = 'error'
-//   }
-//   res.send(response)
-
-// })
-
 
 responses.post('/:userOrApp', async (req, res, next) => { 
   let userOrApp = req.params.userOrApp 

@@ -88,17 +88,21 @@ app.use('/d/:incId/:userId', async (req, res, next) => {
   let userId = req.params.userId
 
   let incData = await ctrl.inc.getIncById(incId)
-  let usrData = await ctrl.user.getAllUsersByIds(userId)
+  let userResponseData = await ctrl.respUser.getRespUserByUserId(userId)
+  let userData = await ctrl.user.getAllUsersByIds(userId).then(resp => resp[0])
   let deptData = await ctrl.dept.getDeptByUserId(userId)
+  
+  userData.responses = userResponseData
 
   let respData = {
     resp_user: await ctrl.respUser.getRespUserByIncId(incId),
     resp_app: await ctrl.respApp.getRespAppByIncId(incId)
   }
+  
   // NOTE: temporarily fetch more data from here to initialize the app
   res.send({
     data: {
-      user: usrData,
+      user: userData,
       dept: deptData,
       inc: incData,
       resp: respData
