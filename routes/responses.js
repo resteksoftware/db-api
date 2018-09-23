@@ -65,6 +65,9 @@ responses.patch('/:userOrApp/:respId', async (req, res, next) => {
   let body = JSON.parse(req.body)
   let response;
   if (userOrApp === 'user') {
+    if (body.closing_resp_gps) {
+      body.closing_resp_gps = JSON.stringify(body.closing_resp_gps)
+    }
     response = await ctrl.respUser.updateRespUser(respId, body)
     //[1][0]
   } else if (userOrApp === 'apparatus') {
