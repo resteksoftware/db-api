@@ -104,7 +104,7 @@ describe('API/INCIDENTS', function() {
         incidentRemark = data.inc.genIncRemark()
         incidentStatus = data.inc.genIncStatus()
         incidentAssignment = await data.inc.genIncAssignment(deptId)
-        
+
         let body = {
           dept_id: deptId,
           data: {
@@ -142,10 +142,35 @@ describe('API/INCIDENTS', function() {
 
   describe('GET "/"', function(done) {
 
+    it('should get all incidents', function(done) {
+        request(server)
+        .get(`/api/incidents/`)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) console.log(err);
+          expect(res.body).to.be.an('array')
+          expect(res.body[0]).to.have.property('inc_status_id')
+          expect(res.body[0]).to.have.property('inc_id')
+          done()
+        })
+    })
+
+    it('should get an incident by fireId', function(done) {
+        request(server)
+        .get(`/api/incidents/?fireId=${incident.fd_dispatch_id}`)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) console.log(err);
+          expect(res.body).to.be.an('object')
+          expect(res.body).to.have.property('inc_id').that.is.a('number')
+          // expect(res.body[0]).to.have.property('inc_status_id')
+          done()
+        })
+    })
+
     it('should get all incidents by dept_id', function(done) {
       request(server)
-      .get(`/api/incidents`)
-      .send({dept_id: deptId})
+      .get(`/api/incidents/?dept_id=${deptId}`)
       .expect(200)
       .end(function(err, res) {
         if (err) console.log(err);
@@ -158,8 +183,7 @@ describe('API/INCIDENTS', function() {
 
     it('should get a complete incident by inc_id', function(done) {
       request(server)
-      .get(`/api/incidents`)
-      .send({inc_id: incId})
+      .get(`/api/incidents/?inc_id=${incId}`)
       .expect(200)
       .end(function(err, res) {
         if (err) console.log(err);
@@ -213,7 +237,7 @@ describe('API/INCIDENTS', function() {
           })
       })
     })
-    
+
   })
 
 })

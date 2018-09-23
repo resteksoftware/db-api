@@ -59,10 +59,22 @@ const getIncStatusByIncId = (incId) => {
   .catch (err => console.error(err))
 }
 
+/**
+ * Get all incidents
+ * @returns {array} incidents - an array of incident objects.
+ */
+const getAllIncs = () => {
+  return db.incidents.findAll({
+    raw: true
+  })
+  .then( incidents => incidents )
+  .catch( err => {
+    console.error(`ERROR in getAllIncs: ${err}`)
+  })
+}
+
 // getAllIncidents: returns all incidents by deptId
 const getAllIncsByDeptId = (deptId) => {
-
-  // get incident joined with
   return db.incidents.findAll({
     where: {
       dept_id: deptId
@@ -191,8 +203,6 @@ const deleteInc = (incId) => {
   })
   .then(resp => 'incident was successfully deleted')
   .catch(err => console.log(err))
-
-
 }
 
 // deleteAllApparatus
@@ -213,6 +223,7 @@ module.exports = {
   getIncById            : getIncById,
   getIncByDeptIdAndSlug : getIncByDeptIdAndSlug,
   getIncByFireDispatchId: getIncByFireDispatchId,
+  getAllIncs            : getAllIncs,
   getAllIncsByDeptId    : getAllIncsByDeptId,
   getRecentIncsByDeptId : getRecentIncsByDeptId,
   getIncStatusByIncId   : getIncStatusByIncId,

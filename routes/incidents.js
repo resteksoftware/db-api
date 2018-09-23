@@ -14,29 +14,25 @@ const { logDate } = require('../util/logDate')
 const DEBUG = require('../logconfig').routes.incidents // Set this to 'true' to activate console logging of several important variables
 
 /**
- * Get all incidents ordered by created_at DESC.
- * @returns {array} Call objects in an array.
+ * Get incidents.
  */
 incidents.get('/', async (req, res) => {
   if (req.query) {
+    let inc
     if (Object.keys(req.query).includes('fireId')) {
-      let inc = await ctrl.inc.getIncByFireDispatchId(req.query.fireId)
+      inc = await ctrl.inc.getIncByFireDispatchId(req.query.fireId)
+      res.send(inc)
+    } else if (Object.keys(req.query).includes('inc_id')) {
+      inc = await ctrl.inc.getIncById(req.query.inc_id)
+      res.send(inc)
+    } else if (Object.keys(req.query).includes('dept_id')) {
+      inc = await ctrl.inc.getAllIncsByDeptId(req.query.dept_id)
+      res.send(inc)
+    } else {
+      inc = await ctrl.inc.getAllIncs()
       res.send(inc)
     }
   }
-
-  // // TODO: this should be revised. should not use req.body with GET
-  // let body = JSON.parse(req.body)
-  // if (DEBUG) console.log(`👉 GET api/incidents/ \n body: ${JSON.stringify(body, null, 2)}`);
-  // let incRes;
-  // if (body.inc_id) {
-  //   incRes = await ctrl.inc.getIncById(body.inc_id)
-  //   res.send(incRes)
-  // } else if (body.dept_id){
-  //   incRes = await ctrl.inc.getAllIncsByDeptId(body.dept_id)
-  //   res.send(incRes)
-  // }
-
 })
 
 /**
