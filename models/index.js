@@ -19,16 +19,11 @@ if (NODE_ENV === 'production') {
   var DBUSER = 'webapplogin'
   var dbHost = 'dispatchresponse.cyqnwvgizc2j.us-east-1.rds.amazonaws.com'
   isDbConnSSL = true
-} else if (NODE_ENV === 'development') {
+} else if (NODE_ENV === 'development' || NODE_ENV === 'mocha-testing') {
   var DBNAME = 'smrtfire_clone'
   var DBUSER = 'webapplogin'
   var dbHost = 'restek-dev.czxcxlqkmhwz.us-east-1.rds.amazonaws.com'
-  isDbConnSSL = false
-} else if (NODE_ENV === 'mocha-testing') {
-  var DBNAME = 'smrtfire'
-  var DBUSER = 'webapplogin'
-  var dbHost = 'dispatchresponse.cyqnwvgizc2j.us-east-1.rds.amazonaws.com'
-  shouldLog = false
+  isDbConnSSL = true
 } else {
   console.error(chalk.red(`ERROR: No database connection was made`))
 }
