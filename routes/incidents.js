@@ -3,6 +3,7 @@
  * @module routes/incidents
  */
 
+const chalk = require('chalk')
 const express = require('express')
 const incidents = express.Router()
 const ctrl = require('../controllers')
@@ -117,35 +118,44 @@ incidents.post('/:incType', async (req, res, next) => {
     // store incident details
     let inc = body.data.inc
     let deptId = JSON.parse(req.body).dept_id
-    // stringify inc properties
+    // stringify inc hot and warm zone properties
     inc.hot_zone = JSON.stringify(inc.hot_zone)
     inc.warm_zone = JSON.stringify(inc.warm_zone)
 
-    // store inc_status details
-    // let incStatus = body.data.incStatus
-    let incStatus = JSON.stringify(inc.inc_status)
-
-    // store inc_remark details
+    // prepare inc_remark details
     let incRemark = {
       inc_id: '',
       remark: inc.inc_remarks
     }
-    // store inc_assignment details
+    // prepare inc_assignment details
     let incAssignment = {
       inc_id: '',
-      // assignment: JSON.stringify(inc.inc_assignment) + ''
       assignment: inc.inc_assignment
     }
 
-    // insert inc_status
-    let incStatusId = await ctrl.incStatus.saveIncStatus(incStatus)
+    // prepare inc_status details
+    let update = {}
+    // if active then update both pending and active (remember this is a 'new' entry)
+    // the client may not have a pending type of entry, they may go direct to active
+    if (inc.inc_status === 'ACTIVE' || inc.inc_status === 'active') {
+      update.pending = inc.lastUpdate
+      update.active = inc.lastUpdate
+    } else if (inc.inc_status === 'PENDING' || inc.inc_status === 'pending') {
+      update.pending = inc.lastUpdate
+    }
+
+    // create a blank entry in the incident_statuses table
+    let incStatusId = await ctrl.incStatus.saveIncStatus()
+    // update the new entry with a pending or (pending and active) timestamp
+    let incStatusUpdate = await ctrl.incStatus.updateIncStatus(incStatusId, update)
+
     // insert incident
     let newIncId = await ctrl.inc.saveInc(inc, deptId, incStatusId)
     // insert inc_remark
     incRemark.inc_id = newIncId
-    incAssignment.inc_id = newIncId
     let incRemarkId = await ctrl.incRemark.saveIncRemark(incRemark)
     // insert inc_assignment
+    incAssignment.inc_id = newIncId
     let incAssignmentId = await ctrl.incAssignment.saveIncAssignment(incAssignment)
 
     res.send({
@@ -167,7 +177,7 @@ incidents.post('/:incType', async (req, res, next) => {
 
     if (incType === 'assignment') {
       let assignment = body.data.incAssignment
-      if (inc.inc_id) {
+      if (inc !== undefined) {
         let incAssignment = {
           inc_id: inc.inc_id,
           assignment: assignment
@@ -180,7 +190,7 @@ incidents.post('/:incType', async (req, res, next) => {
     // incident is an update to remark (new record)
     if (incType === 'remark') {
       let remark = body.data.incRemark
-      if (inc.inc_id) {
+      if (inc !== undefined) {
         let incRemark = {
           inc_id: inc.inc_id,
           remark: remark
@@ -194,34 +204,36 @@ incidents.post('/:incType', async (req, res, next) => {
     if (incType === 'status') {
       let update = {}
       let incStatusObj = body.data
-      let incidentStatus = await ctrl.incStatus.getIncStatusByIncId(inc.inc_id)
-      let incStatusId = incidentStatus.dataValues.inc_status_id
-      let status = incStatusObj.incStatus  // i.e. ACTIVE or PENDING
-      let updateTimeStamp = incStatusObj.updateTimeStamp
+      if (inc !== undefined) {
+        let incidentStatus = await ctrl.incStatus.getIncStatusByIncId(inc.inc_id)
+        let incStatusId = incidentStatus.dataValues.inc_status_id
+        let status = incStatusObj.incStatus  // i.e. ACTIVE or PENDING
+        let updateTimeStamp = incStatusObj.updateTimeStamp
 
-      if (status === 'pending' || status === 'PENDING') {
-        update.pending = updateTimeStamp
-      } else if (status === 'active' || status === 'ACTIVE') {
-        update.active = updateTimeStamp
-      } else if (status === 'closed' || status === 'CLOSED') {
-        update.closed = updateTimeStamp
-      } else if (status === 'cancelled' || status === 'CANCELLED') {
-        update.cancelled = updateTimeStamp
-      } else if (status === 'filed' || status === 'FILED') {
-        update.filed = updateTimeStamp
-      } else {
-        console.error(`ERROR: Cannot update incident_statuses: status type not known`)
-      }
+        if (status === 'pending' || status === 'PENDING') {
+          update.pending = updateTimeStamp
+        } else if (status === 'active' || status === 'ACTIVE') {
+          update.active = updateTimeStamp
+        } else if (status === 'closed' || status === 'CLOSED') {
+          update.closed = updateTimeStamp
+        } else if (status === 'cancelled' || status === 'CANCELLED') {
+          update.cancelled = updateTimeStamp
+        } else if (status === 'filed' || status === 'FILED') {
+          update.filed = updateTimeStamp
+        } else {
+          console.error(`ERROR: Cannot update incident_statuses: status type not known`)
+        }
 
-      if (incStatusId) {
-        // patch the inc status
-        let result = await ctrl.incStatus.updateIncStatus(incStatusId, update)
-        res.send({ inc_status_id: result })
+        if (incStatusId) {
+          // patch the inc status
+          let result = await ctrl.incStatus.updateIncStatus(incStatusId, update)
+          res.send({ inc_status_id: result })
+        }
       }
     }
 
     if (incType === 'radio_freq') {
-      console.error(`ERROR: Not tracking radio_freq changes yet`)
+      console.info(chalk.yellow(`INFO: Not tracking radio_freq changes yet`))
     }
 
   } else {

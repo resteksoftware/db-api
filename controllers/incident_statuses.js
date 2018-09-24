@@ -42,16 +42,20 @@ const getIncStatusByIncId = (incId) => {
     })
     .then( incidentStatus => incidentStatus )
     .catch( err => {
-      console.error(`ERROR in getIncStatusByIncId:  + ${err}`)
+      console.error(`ERROR in getIncStatusByIncId: ${err}`)
     })
 }
 
-// saveIncident: saves incident and returns new incident_id
-const saveIncStatus = (incidentStatus, incId) => {
-  if (incId) incidentStatus.inc_id = incId
-  return db.incident_statuses.create(incidentStatus)
+/**
+ * Create a new incident status entry
+ * @returns {number} incStatusId - the incident status ID for the new entry
+ */
+const saveIncStatus = () => {
+  return db.incident_statuses.create()
   .then( incStatus => incStatus.id )
-  .catch( err => err )
+  .catch( err => {
+    console.error(`ERROR in saveIncStatus: ${err}`)
+  })
 }
 
 // saveAllIncidents: saves all incident_statuses and returns success/fail
