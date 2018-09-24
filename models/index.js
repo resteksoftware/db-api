@@ -24,6 +24,9 @@ if (NODE_ENV === 'production') {
   var DBUSER = 'webapplogin'
   var dbHost = 'restek-dev.czxcxlqkmhwz.us-east-1.rds.amazonaws.com'
   isDbConnSSL = true
+  if (NODE_ENV === 'mocha-testing') {
+    shouldLog = false
+  }
 } else {
   console.error(chalk.red(`ERROR: No database connection was made`))
 }
