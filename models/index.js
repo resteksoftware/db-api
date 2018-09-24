@@ -4,6 +4,7 @@
 
 const Sequelize = require('sequelize')
 const env = require('env2')('.env')
+const chalk = require('chalk')
 
 // Retrieve environment variables
 const NODE_ENV = process.env.NODE_ENV
@@ -12,16 +13,24 @@ const DB_PG_PASSWD = process.env.DB_PG_PASSWD
 // Initialize database settings
 var db = {}
 var shouldLog = require('../logconfig').models.index
-const DBNAME = 'smrtfire'
-const DBUSER = 'webapplogin'
-var dbHost = 'dispatchresponse.cyqnwvgizc2j.us-east-1.rds.amazonaws.com'
 var isDbConnSSL = false // for AWS use true, for localhost use false
 if (NODE_ENV === 'production') {
+  var DBNAME = 'smrtfire'
+  var DBUSER = 'webapplogin'
+  var dbHost = 'dispatchresponse.cyqnwvgizc2j.us-east-1.rds.amazonaws.com'
   isDbConnSSL = true
-}
-
-if (NODE_ENV === 'mocha-testing') {
+} else if (NODE_ENV === 'development') {
+  var DBNAME = 'smrtfire_clone'
+  var DBUSER = 'webapplogin'
+  var dbHost = 'restek-dev.czxcxlqkmhwz.us-east-1.rds.amazonaws.com'
+  isDbConnSSL = false
+} else if (NODE_ENV === 'mocha-testing') {
+  var DBNAME = 'smrtfire'
+  var DBUSER = 'webapplogin'
+  var dbHost = 'dispatchresponse.cyqnwvgizc2j.us-east-1.rds.amazonaws.com'
   shouldLog = false
+} else {
+  console.error(chalk.red(`ERROR: No database connection was made`))
 }
 
 const sequelize = new Sequelize(DBNAME, DBUSER, DB_PG_PASSWD, {
