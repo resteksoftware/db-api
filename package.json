@@ -1,6 +1,6 @@
 {
-  "name": "DispatchResponse",
-  "version": "1.0.0",
+  "name": "ResTek",
+  "version": "0.1.0",
   "engines": {
     "node": ">=8.0 <11"
   },
@@ -14,7 +14,8 @@
   "scripts": {
     "start": "node ./bin/www",
     "start:dev": "nodemon ./bin/www",
-    "test": "NODE_ENV=mocha-testing nyc mocha --watch --timeout=3000 ./tests/*/*.test.js --sort"
+    "test": "NODE_ENV=mocha-testing nyc mocha --watch --timeout=3000 ./tests/*/*.test.js --sort",
+    "wipe-database-clone": "NODE_ENV=development psql -h restek-dev.czxcxlqkmhwz.us-east-1.rds.amazonaws.com -U webapplogin smrtfire_clone < ./scripts/db_create/create_db.sql && node ./scripts/db_seed/insert_carriers.js"
   },
   "repository": {
     "type": "git",

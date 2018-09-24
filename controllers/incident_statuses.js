@@ -42,7 +42,7 @@ const getIncStatusByIncId = (incId) => {
     })
     .then( incidentStatus => incidentStatus )
     .catch( err => {
-      console.error(`ERROR in getIncStatusIdByIncId:  + ${err}`)
+      console.error(`ERROR in getIncStatusByIncId:  + ${err}`)
     })
 }
 

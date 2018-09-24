@@ -355,7 +355,11 @@ const seedUnderdog = async () => {
                 users[1].default_station = staId
             }
             // post app
-            let appId = await axios.post('http://localhost:8080/api/apparatus', appToInsert).then(resp => resp.data.app_id)
+            let appId = await axios.post('http://localhost:8080/api/apparatus', appToInsert)
+            .then(resp => resp.data.app_id)
+            .catch(function (error) {
+              console.error(`ERROR in apparatus insert: ${error}`);
+            })
             output.push(appId)
         }
         console.log(`👉 sta_id: ${staId} has associated app_ids: ${output + ''}`)
@@ -369,15 +373,17 @@ const seedUnderdog = async () => {
             dept_id: deptId
         }
     })
+    .then(res => res)
+    .catch(function (error) {
+      console.error(`ERROR in user post: ${error}`);
+    })
 
-    let userIds = await axios({
-        method: 'get',
-        url: 'http://localhost:8080/api/users/',
-        data: { dept_id: deptId }
-    }).then(res => res.data.map(user => user.user_id))
-    if (DEBUG) console.log(`👉 userIds returned: \n${userIds}`);
+    let userIds = await axios.get(`http://localhost:8080/api/users/dept-id/${deptId}`)
+    .then(res => res.data.map(user => console.log(`${user.user_id} ${user.first_name}`)))
+    .catch(function (error) {
+      console.error(`ERROR in user get: ${error}`);
+    })
     if (DEBUG) console.log(`👉 done`);
-
 }
 
 seedUnderdog()
