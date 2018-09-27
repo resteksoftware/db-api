@@ -47,7 +47,7 @@ const sequelize = new Sequelize(DBNAME, DBUSER, DB_PG_PASSWD, {
     timestamps: true,
     userscored: true
   },
-  logging: shouldLog ? (log) => { console.log(log) } : () => { return }
+  logging: false
 })
 
 db.sequelize = sequelize

@@ -39,7 +39,7 @@ const NODE_ENV = process.env.NODE_ENV
 
 const DEBUG = require('./logconfig').app
 
-const consumeSQS = require('./util/consumeSQS').app
+const consumeSQS = require('./util/configSQS').consumeSQS
 
 if (NODE_ENV !== 'mocha-testing') {
   // /** morgan - log only 4xx and 5xx responses to console */
@@ -91,14 +91,14 @@ app.use('/d/:incId/:userId', async (req, res, next) => {
   let userResponseData = await ctrl.respUser.getRespUserByUserId(userId)
   let userData = await ctrl.user.getAllUsersByIds(userId).then(resp => resp[0])
   let deptData = await ctrl.dept.getDeptByUserId(userId)
-  
+
   userData.responses = userResponseData
 
   let respData = {
     resp_user: await ctrl.respUser.getRespUserByIncId(incId),
     resp_app: await ctrl.respApp.getRespAppByIncId(incId)
   }
-  
+
   // NOTE: temporarily fetch more data from here to initialize the app
   res.send({
     data: {
@@ -159,6 +159,7 @@ consumeSQS.on('error', (err) => {
 const dbNewPost = (parsedMessage) => {
   axios.post(`http://0.0.0.0:8080/api/incidents/new`, {
         dept_id: parsedMessage.data.dept_id,
+        messageGroupId: parsedMessage.messageGroupId,
         data: {
           inc: parsedMessage.data,
           incStatus: parsedMessage.data.inc_status,
@@ -183,6 +184,7 @@ const dbNewPost = (parsedMessage) => {
 const dbUpdatePost = (parsedMessage, pubType) => {
   axios.post(`http://0.0.0.0:8080/api/incidents/${pubType}`, {
         dept_id: parsedMessage.data.dept_id,
+        messageGroupId: parsedMessage.messageGroupId,
         data: parsedMessage.data
     })
     .then(function(response) {
@@ -195,7 +197,9 @@ const dbUpdatePost = (parsedMessage, pubType) => {
 
 consumeSQS.on('message_received', (message) => {
   let parsedMessage = JSON.parse(message.Body)
-  let deptId = parseInt(message.MessageAttributes.departId.StringValue)
+  let deptId = parseInt(message.MessageAttributes.departId.StringValue) // i.e. 1 {number}
+  parsedMessage.messageGroupId = message.Attributes.MessageGroupId // i.e. GFD-UDOG {string}
+
   try {
     if (parsedMessage.pubType === 'new') {
       dbNewPost(parsedMessage)

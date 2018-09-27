@@ -9,6 +9,7 @@ const incidents = express.Router()
 const ctrl = require('../controllers')
 const processData = require('./util/processCallData')
 const sendRustybearEmail = require('./util/sendEmailPooledRustybear')
+const sendToSQS = require('../util/configSQS').sendToSQS
 
 const { logDate } = require('../util/logDate')
 
@@ -112,12 +113,13 @@ incidents.post('/:incType', async (req, res, next) => {
   const incType = req.params.incType;
   let body = JSON.parse(req.body)
   let incId = body.inc_id || false
+  let messageGroupId = body.messageGroupId
+  let deptId = JSON.parse(req.body).dept_id
 
   // incident is completely new
   if (incType === 'new') {
     // store incident details
     let inc = body.data.inc
-    let deptId = JSON.parse(req.body).dept_id
     // stringify inc hot and warm zone properties
     inc.hot_zone = JSON.stringify(inc.hot_zone)
     inc.warm_zone = JSON.stringify(inc.warm_zone)
@@ -157,6 +159,9 @@ incidents.post('/:incType', async (req, res, next) => {
     // insert inc_assignment
     incAssignment.inc_id = newIncId
     let incAssignmentId = await ctrl.incAssignment.saveIncAssignment(incAssignment)
+
+    // send the 'new' incident to SQS for consumption by mailer (email-SMS)
+    sendToSQS(inc, JSON.stringify(deptId), messageGroupId)
 
     res.send({
       inc_id: newIncId,

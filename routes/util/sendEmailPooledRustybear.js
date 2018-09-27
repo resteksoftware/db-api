@@ -49,10 +49,9 @@ const sendEmail = (data, recipients) => {
     messages.push({
       from: SENDER_EMAIL_ADDRESS,
       to: `${name} ${recipient.address}`,
-      subject: 'GFD',
-      text: `${data.call_category}
+      subject: 'UDOG',
+      text: `${data.inc_category}
  ${data.location} ${data.city}
- ${data.assignment}
  <https://gfd.gr/${data.slug}/${recipient.userId}>
 `
     })
