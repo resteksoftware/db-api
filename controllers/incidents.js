@@ -80,7 +80,8 @@ const getAllIncsByDeptId = (deptId) => {
   SELECT *
       FROM incidents
       RIGHT JOIN incident_statuses on incidents.inc_status_id = incident_statuses.inc_status_id
-      WHERE incidents.dept_id=${deptId}`,
+      WHERE incidents.dept_id=${deptId}
+      ORDER BY incidents.inc_id DESC`,
     { type: db.sequelize.QueryTypes.SELECT })
     .then(async (incidents) => {
       let incOutput = incidents;

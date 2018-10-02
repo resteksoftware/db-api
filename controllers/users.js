@@ -119,7 +119,7 @@ const saveUser = (user, carrierId, defaultStationId) => {
 
   return  db.users.create(user)
   .then( user => user.id)
-  .catch( err => reject(err) )
+  .catch( err => console.error(err) )
 }
 
 // saveAllUsers: saves all users and returns success/fail

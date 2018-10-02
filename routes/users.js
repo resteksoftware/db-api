@@ -112,7 +112,7 @@ users.post('/', async (req, res, next) => {
       track_id: trackIds
     })
   // else user is one user, and does not require iteration
-  } else {
+  } else {  
     let userId = await ctrl.user.saveUser(bodyDetails.user)
     let trackId = await ctrl.user.saveUserToDepartment(bodyDetails.dept_id, userId)
     res.send({
