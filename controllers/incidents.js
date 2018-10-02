@@ -75,15 +75,34 @@ const getAllIncs = () => {
 
 // getAllIncidents: returns all incidents by deptId
 const getAllIncsByDeptId = (deptId) => {
-  return db.incidents.findAll({
-    where: {
-      dept_id: deptId
-    },
-    raw: true
-  })
-  .then( incidents => incidents )
-  .catch( err => err )
-
+  // get incident body and status
+  return db.sequelize.query(`
+  SELECT *
+      FROM incidents
+      RIGHT JOIN incident_statuses on incidents.inc_status_id = incident_statuses.inc_status_id
+      WHERE incidents.dept_id=${deptId}`,
+    { type: db.sequelize.QueryTypes.SELECT })
+    .then(async (incidents) => {
+      let incOutput = incidents;
+      // iterate across incidents
+      for (var i = 0; i < incidents.length; i ++) {
+        // fetch assignments associated to incident
+        let incAssignments = await db.incident_assignments.findAll({
+          where: { inc_id: incidents[i].inc_id },
+          raw: true  
+        })  
+        // fetch remarks associated to incident
+        let incRemarks = await db.incident_remarks.findAll({
+          where: { inc_id: incidents[i].inc_id },
+          raw: true  
+        })
+        // append results to associated incident
+        incOutput[i].assignments = incAssignments
+        incOutput[i].remarks = incRemarks
+      }
+      return incOutput
+    })
+    .catch(err => console.error(err) )
 }
 
 /**

@@ -23,17 +23,14 @@ incidents.get('/', async (req, res) => {
     let inc
     if (Object.keys(req.query).includes('fireId')) {
       inc = await ctrl.inc.getIncByFireDispatchId(req.query.fireId)
-      res.send(inc)
     } else if (Object.keys(req.query).includes('inc_id')) {
       inc = await ctrl.inc.getIncById(req.query.inc_id)
-      res.send(inc)
     } else if (Object.keys(req.query).includes('dept_id')) {
       inc = await ctrl.inc.getAllIncsByDeptId(req.query.dept_id)
-      res.send(inc)
     } else {
       inc = await ctrl.inc.getAllIncs()
-      res.send(inc)
     }
+    res.send(inc)
   }
 })
 
