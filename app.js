@@ -83,6 +83,7 @@ app.use('/api/incidents', incidents)
 app.use('/api/stations', stations)
 app.use('/api/responses', responses)
 app.use('/api/users', users)
+// TODO: discuss how expensive this is and the best way to break it out (nfd)
 app.use('/d/:incId/:userId', async (req, res, next) => {
   let incId = req.params.incId
   let userId = req.params.userId

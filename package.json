@@ -13,7 +13,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./bin/www",
-    "start:dev": "nodemon ./bin/www",
+    "start:dev": "NODE_ENV=development nodemon ./bin/www",
     "test": "NODE_ENV=mocha-testing nyc mocha --watch --timeout=3000 ./tests/*/*.test.js --sort",
     "wipe-database-clone": "NODE_ENV=development psql -h restek-dev.czxcxlqkmhwz.us-east-1.rds.amazonaws.com -U webapplogin smrtfire_clone < ./scripts/db_create/create_db.sql && node ./scripts/db_seed/insert_carriers.js"
   },
