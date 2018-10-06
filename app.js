@@ -53,7 +53,7 @@ if (NODE_ENV !== 'mocha-testing') {
 }
 
 const corsOptions = {
-  origin: ['http://dispatch', 'http://dispatch:3001', 'http://0.0.0.0', 'http://0.0.0.0:3001', 'http://localhost:8080'],
+  origin: ['http://mailer:8088', 'http://dispatch:3001', 'http://0.0.0.0', 'http://0.0.0.0:3001', 'http://localhost:8080', 'http://0.0.0.0:8088'],
   credentials: true,
   optionsSuccessStatus: 200
 }

@@ -150,6 +150,7 @@ incidents.post('/:incType', async (req, res, next) => {
 
     // insert incident
     let newIncId = await ctrl.inc.saveInc(inc, deptId, incStatusId)
+    inc.inc_id = newIncId
     // insert inc_remark
     incRemark.inc_id = newIncId
     let incRemarkId = await ctrl.incRemark.saveIncRemark(incRemark)
