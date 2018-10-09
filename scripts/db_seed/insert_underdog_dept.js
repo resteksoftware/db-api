@@ -28,6 +28,7 @@ let users = [
         "is_admin": true,
         "is_deleted": false,
         "is_career": true,
+        "is_engine": false,
         "is_volley": false
     },
     {
@@ -45,6 +46,7 @@ let users = [
         "is_admin": true,
         "is_deleted": false,
         "is_career": false,
+        "is_engine": false,
         "is_volley": true
     }
 ]

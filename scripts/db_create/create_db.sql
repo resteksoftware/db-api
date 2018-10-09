@@ -105,6 +105,7 @@ CREATE TABLE "users" (
 	"is_deleted" BOOLEAN NOT NULL,
 	"is_career" BOOLEAN NOT NULL,
 	"is_volley" BOOLEAN NOT NULL,
+	"is_engine" BOOLEAN NOT NULL,
 	"created_at" TIMESTAMP NOT NULL,
 	"updated_at" TIMESTAMP NOT NULL,
 	CONSTRAINT users_pk PRIMARY KEY ("user_id")
