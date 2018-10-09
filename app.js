@@ -52,10 +52,28 @@ if (NODE_ENV !== 'mocha-testing') {
   )
 }
 
-const corsOptions = {
-  origin: ['http://mailer:8088', 'http://dispatch:3001', 'http://0.0.0.0', 'http://0.0.0.0:3001', 'http://localhost:8080', 'http://0.0.0.0:8088'],
-  credentials: true,
-  optionsSuccessStatus: 200
+const CORS_whitelist = [
+  'http://mailer:8088',
+  'http://dispatch:3001',
+  'http://0.0.0.0',
+  'http://rt.vg',
+  'http://0.0.0.0:3001',
+  'http://0.0.0.0:8088',
+  'http://localhost:8080'
+]
+
+const corsOptions = function (req, callback) {
+  let cOptions;
+  if (CORS_whitelist.indexOf(req.header('Origin')) !== -1) {
+    cOptions = {
+      origin: true,
+      credentials: true,
+      optionsSuccessStatus: 200
+    } // enable the requested origin in the CORS response
+  } else {
+    cOptions = { origin: false } // disable CORS for this request
+  }
+  callback(null, cOptions)
 }
 
 // middleware

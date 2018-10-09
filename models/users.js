@@ -90,6 +90,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: false
       },
+      is_engine: {
+        // admin sets this
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
       is_volley: {
         // admin sets this
         type: Sequelize.BOOLEAN,
