@@ -90,12 +90,12 @@ const getAllIncsByDeptId = (deptId) => {
         // fetch assignments associated to incident
         let incAssignments = await db.incident_assignments.findAll({
           where: { inc_id: incidents[i].inc_id },
-          raw: true  
-        })  
+          raw: true
+        })
         // fetch remarks associated to incident
         let incRemarks = await db.incident_remarks.findAll({
           where: { inc_id: incidents[i].inc_id },
-          raw: true  
+          raw: true
         })
         // append results to associated incident
         incOutput[i].assignments = incAssignments
@@ -107,7 +107,7 @@ const getAllIncsByDeptId = (deptId) => {
 }
 
 /**
- * Get incident by fire dispatch ID
+  Get incident by fire dispatch ID
  * @param {string} fireDispatchId - dispatch ID from client.
  * @returns {object} an incident object.
  */

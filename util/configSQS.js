@@ -15,10 +15,10 @@ let PRODUCE_URL = ''
 let CONSUME_URL = ''
 
 if (NODE_ENV === 'development') {
-  CONSUME_URL = 'https://sqs.us-east-1.amazonaws.com/438058720692/test-processed.fifo'
+  CONSUME_URL = 'https://sqs.us-east-1.amazonaws.com/438058720692/test-stacked.fifo'
   PRODUCE_URL = 'https://sqs.us-east-1.amazonaws.com/438058720692/test-sms.fifo'
 } else if (NODE_ENV === 'production') {
-  CONSUME_URL = 'https://sqs.us-east-1.amazonaws.com/438058720692/dispatch-processed.fifo'
+  CONSUME_URL = 'https://sqs.us-east-1.amazonaws.com/438058720692/dispatch-stacked.fifo'
   PRODUCE_URL = 'https://sqs.us-east-1.amazonaws.com/438058720692/dispatch-sms.fifo'
 } else {
   console.error(`ERROR: CONSUME_URL for SQS has not been defined`)

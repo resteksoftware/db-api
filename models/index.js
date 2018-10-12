@@ -20,9 +20,9 @@ if (NODE_ENV === 'production') {
   var dbHost = 'dispatchresponse.cyqnwvgizc2j.us-east-1.rds.amazonaws.com'
   isDbConnSSL = true
 } else if (NODE_ENV === 'development' || NODE_ENV === 'mocha-testing') {
-  var DBNAME = 'smrtfire' //'smrtfire_clone'
+  var DBNAME = 'smrtfire_clone'
   var DBUSER = 'webapplogin'
-  var dbHost = 'dispatchresponse.cyqnwvgizc2j.us-east-1.rds.amazonaws.com'//'restek-dev.czxcxlqkmhwz.us-east-1.rds.amazonaws.com'
+  var dbHost = 'restek-dev.czxcxlqkmhwz.us-east-1.rds.amazonaws.com'
   isDbConnSSL = true
   if (NODE_ENV === 'mocha-testing') {
     shouldLog = false
