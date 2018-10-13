@@ -24,7 +24,8 @@ let incident = {
     'longitude'       : '',
     'hot_zone'        : '',
     'warm_zone'       : '',
-    'test_call'       : true
+    'test_call'       : true,
+    'messageGroupId'  : ''
   }
 
 let incident_status = {
@@ -134,6 +135,7 @@ const genIncident = () => {
   inc.hot_zone        = zone.buildGeoFence(6, inc.latitude, inc.longitude, .2)
   inc.warm_zone       = zone.buildGeoFence(6, inc.latitude, inc.longitude, 1)
   inc.test_call       = true
+  inc.messageGroupId  = 'GFD-UDOG'
 
   return inc;
 }
@@ -186,7 +188,7 @@ const genIncAssignment = async (deptId) => {
       if (idx !== appIdx) return el
     })
   }
-  
+
   return {assignment: appArr.toString()}
 }
 

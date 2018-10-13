@@ -14,7 +14,11 @@ const DB_PG_PASSWD = process.env.DB_PG_PASSWD
 var db = {}
 var shouldLog = require('../logconfig').models.index
 var isDbConnSSL = false // for AWS use true, for localhost use false
-if (NODE_ENV === 'production') {
+
+// TODO:  change next line by removing mocha-testing before going into
+// production
+//
+if (NODE_ENV === 'production' || NODE_ENV === 'mocha-testing') {
   var DBNAME = 'smrtfire'
   var DBUSER = 'webapplogin'
   var dbHost = 'dispatchresponse.cyqnwvgizc2j.us-east-1.rds.amazonaws.com'

@@ -107,6 +107,7 @@ describe('API/INCIDENTS', function() {
 
         let body = {
           dept_id: deptId,
+          messageGroupId: incident.messageGroupId,
           data: {
             inc: incident,
             incStatus: incidentStatus,

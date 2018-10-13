@@ -21,7 +21,7 @@ describe('API/RESPONSES', function() {
   let staIds = new Set();
   let apps = [];
   let appIds = new Set();
-  let trackUserDeptIds = new Set(); 
+  let trackUserDeptIds = new Set();
   let incident;
   let incidentRemark;
   let incidentStatus;
@@ -131,7 +131,7 @@ describe('API/RESPONSES', function() {
                       if (DEBUG) console.log(`👉 Generated user_dept_ids: ${res.body.track_id}`)
                       res.body.user_id.forEach(id => userIds.add(id))
                       res.body.track_id.forEach(id => trackUserDeptIds.add(id))
-                    
+
                       // post an incident
                         incident = data.inc.genIncident()
                         incidentRemark = data.inc.genIncRemark()
@@ -140,6 +140,7 @@ describe('API/RESPONSES', function() {
 
                         let body = {
                           dept_id: deptId,
+                          messageGroupId: incident.messageGroupId,
                           data: {
                             inc: incident,
                             incStatus: incidentStatus,
@@ -161,7 +162,7 @@ describe('API/RESPONSES', function() {
                           incId = res.body.inc_id
                           incStatusId = res.body.inc_status_id
                           incRemarkId = res.body.inc_remark_id
-                          incAssignmentId = res.body.inc_assignment_id                          
+                          incAssignmentId = res.body.inc_assignment_id
                           done()
                         })
 
@@ -176,7 +177,7 @@ describe('API/RESPONSES', function() {
 
   describe('POST "/:userOrApp"', function(done) {
 
-    it('should post a response for a user', function(done) {  
+    it('should post a response for a user', function(done) {
       let userResponse = data.resp.genRespUser([...userIds][0], incId)
       request(server)
       .post('/api/responses/user')
@@ -188,9 +189,9 @@ describe('API/RESPONSES', function() {
         expect(res.body).to.have.property('resp_user_id').that.is.a('number')
         done()
       })
-      
-    })    
-    
+
+    })
+
     it('should post a response for an apparatus', function(done) {
       let appResponse = data.resp.genRespApp([...appIds][0], incId)
       request(server)
@@ -203,8 +204,8 @@ describe('API/RESPONSES', function() {
         expect(res.body).to.have.property('resp_app_id').that.is.a('number')
         done()
       })
-      
-    })    
+
+    })
   });
 
 
@@ -241,7 +242,7 @@ describe('API/RESPONSES', function() {
         expect(res.body).to.have.property('resp_app')
         respUserId = res.body.resp_user[0].resp_user_id
         respAppId = res.body.resp_app[0].resp_app_id
-        
+
         done()
       })
     })
@@ -374,6 +375,6 @@ describe('API/RESPONSES', function() {
     // let incAssignmentId;
     // let respUserId;
     // let respAppId;
-   }) 
+   })
 
 
