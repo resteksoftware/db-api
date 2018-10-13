@@ -237,6 +237,18 @@ incidents.post('/:incType', async (req, res, next) => {
 
     if (incType === 'radio_freq') {
       console.info(chalk.yellow(`INFO: Not tracking radio_freq changes yet`))
+
+      // let radio = body.data.incRadioFreq
+      // if (inc !== undefined) {
+      //   let incRadio = {
+      //     inc_id: inc.inc_id,
+      //     radio_freq: radio
+      //   }
+      // }
+      //   // let incRadioId = await ctrl.incRemark.saveIncRemark(incRadio)
+      // let incRadioId = await ctrl.incRadio.saveIncRadio(incRadio)
+      // res.send({ inc_radio_id: incRadioId })
+
     }
 
   } else {

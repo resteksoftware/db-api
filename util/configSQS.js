@@ -14,7 +14,7 @@ const NODE_ENV = process.env.NODE_ENV
 let PRODUCE_URL = ''
 let CONSUME_URL = ''
 
-if (NODE_ENV === 'development') {
+if (NODE_ENV === 'development' || NODE_ENV ==='mocha-testing') {
   CONSUME_URL = 'https://sqs.us-east-1.amazonaws.com/438058720692/test-stacked.fifo'
   PRODUCE_URL = 'https://sqs.us-east-1.amazonaws.com/438058720692/test-sms.fifo'
 } else if (NODE_ENV === 'production') {
